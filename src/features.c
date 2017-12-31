@@ -1,3 +1,3 @@
 #include <csystem/features.h>
 
-const char *const cs_platform_name = PLATFORM_NAME;
+const char *const cs_platform_name = CS_PLATFORM_NAME;

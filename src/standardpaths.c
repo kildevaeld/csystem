@@ -8,7 +8,7 @@
 
 int cs_home_dir(char *buf) {
 
-  const char *dir = getenv("HOME");
+  char *dir = getenv("HOME");
 
   if (dir) {
     strcpy(buf, dir);
@@ -42,14 +42,14 @@ static int append_home(char *buffer, const char *path, size_t size) {
 
 int cs_config_dir(char *buffer) {
   char *data = NULL;
-#if defined(PLATFORM_LINUX)
+#if defined(CS_PLATFORM_LINUX)
   char *config = getenv("XDG_CONFIG_HOME");
   if (config) {
     strcpy(buffer, config);
     return strlen(config);
   }
   return append_home(buffer, "/.config", 8);
-#elif defined(PLATFORM_DARWIN)
+#elif defined(CS_PLATFORM_DARWIN)
   return append_home(buffer, "/Library/Preferences", 20);
 #endif
 
@@ -58,7 +58,7 @@ int cs_config_dir(char *buffer) {
 
 int cs_temp_dir(char *buffer) {
 
-#if defined(PLATFORM_UNIX)
+#if defined(CS_PLATFORM_UNIX)
   char *tmpDir = getenv("TMPDIR");
   if (!tmpDir) {
     if (!(tmpDir = getenv("TEMP")))
@@ -75,14 +75,14 @@ int cs_temp_dir(char *buffer) {
 
 int cs_data_dir(char *buffer) {
   char *data = NULL;
-#if defined(PLATFORM_LINUX)
+#if defined(CS_PLATFORM_LINUX)
   char *config = getenv("XDG_DATA_HOME");
   if (config) {
     strcpy(buffer, config);
     return strlen(config);
   }
   return append_home(buffer, "/.local/share", 13);
-#elif defined(PLATFORM_DARWIN)
+#elif defined(CS_PLATFORM_DARWIN)
   return append_home(buffer, "/Library/Application Support", 28);
 #endif
   return 0;
@@ -90,14 +90,14 @@ int cs_data_dir(char *buffer) {
 
 int cs_cache_dir(char *buffer) {
   char *data = NULL;
-#if defined(PLATFORM_LINUX)
+#if defined(CS_PLATFORM_LINUX)
   char *config = getenv("XDG_CACHE_HOME");
   if (config) {
     strcpy(buffer, config);
     return strlen(config);
   }
   return append_home(buffer, "/.cache", 7);
-#elif defined(PLATFORM_DARWIN)
+#elif defined(CS_PLATFORM_DARWIN)
   return append_home(buffer, "/Library/Caches", 15);
 #endif
   return 0;

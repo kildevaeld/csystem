@@ -16,50 +16,51 @@
 
 #if defined(_WIN32)
 
-#define PLATFORM_NAME "windows" // Windows
-#define PLATFORM_WINDOWS
+#define CS_PLATFORM_NAME "windows" // Windows
+#define CS_PLATFORM_WINDOWS
 #elif defined(_WIN64)
-#define PLATFORM_NAME "windows" // Windows
-#define PLATFORM_WINDOWS
+#define CS_PLATFORM_NAME "windows" // Windows
+#define CS_PLATFORM_WINDOWS
 #elif defined(__CYGWIN__) && !defined(_WIN32)
-#define PLATFORM_NAME "windows" // Windows (Cygwin POSIX under Microsoft Window)
-#define PLATFORM_WINDOWS
+#define CS_PLATFORM_NAME                                                       \
+  "windows" // Windows (Cygwin POSIX under Microsoft Window)
+#define CS_PLATFORM_WINDOWS
 
 #elif defined(__linux__)
-#define PLATFORM_NAME                                                          \
+#define CS_PLATFORM_NAME                                                       \
   "linux" // Debian, Ubuntu, Gentoo, Fedora, openSUSE, RedHat, Centos and other
-#define PLATFORM_LINUX
+#define CS_PLATFORM_LINUX
 
 #elif defined(__unix__) || defined(__APPLE__) && defined(__MACH__)
 #include <sys/param.h>
 #if defined(__hpux)
-#define PLATFORM_NAME "hp-ux" // HP-UX
+#define CS_PLATFORM_NAME "hp-ux" // HP-UX
 #elif defined(_AIX)
-#define PLATFORM_NAME "aix" // IBM AIX
+#define CS_PLATFORM_NAME "aix" // IBM AIX
 
 #elif defined(__APPLE__) && defined(__MACH__) // Apple OSX and iOS (Darwin)
 #include <TargetConditionals.h>
-#define PLATFORM_DARWIN
+#define CS_PLATFORM_DARWIN
 
 #if TARGET_IPHONE_SIMULATOR == 1
-#define PLATFORM_NAME "ios" // Apple iOS
+#define CS_PLATFORM_NAME "ios" // Apple iOS
 #elif TARGET_OS_IPHONE == 1
-#define PLATFORM_NAME "ios" // Apple iOS
+#define CS_PLATFORM_NAME "ios" // Apple iOS
 #elif TARGET_OS_MAC == 1
-#define PLATFORM_NAME "osx" // Apple OSX
+#define CS_PLATFORM_NAME "osx" // Apple OSX
 #endif
 
 #elif defined(BSD)
-#define PLATFORM_NAME "bsd" // FreeBSD, NetBSD, OpenBSD, DragonFly BSD
+#define CS_PLATFORM_NAME "bsd" // FreeBSD, NetBSD, OpenBSD, DragonFly BSD
 #endif
 #elif defined(__sun) && defined(__SVR4)
-#define PLATFORM_NAME "solaris" // Oracle Solaris, Open Indiana
+#define CS_PLATFORM_NAME "solaris" // Oracle Solaris, Open Indiana
 #else
-#define PLATFORM_NAME NULL
+#define CS_PLATFORM_NAME NULL
 #endif
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
-#define PLATFORM_UNIX
+#if defined(CS_PLATFORM_LINUX) || defined(CS_PLATFORM_DARWIN)
+#define CS_PLATFORM_UNIX
 #endif
 
-const char *const cs_platform_name;
+const char *const cs_CS_platform_name;

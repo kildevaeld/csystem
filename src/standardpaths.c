@@ -158,7 +158,7 @@ char *cs_getdatadir(char *buffer, size_t maxlen) {
 
 char *cs_getcachedir(char *buffer, size_t maxlen) {
 #if defined(CS_PLATFORM_LINUX)
-  char *config = from_env("XDG_DATA_HOME", buffer, maxlen);
+  char *config = from_env("XDG_CACHE_HOME", buffer, maxlen);
   if (!config && errno == ERR_NOT_FOUND) {
     config = append_home(buffer, maxlen, "/.cache", 7);
   }

@@ -1,6 +1,7 @@
-#include <csystem/home.h>
+#include <csystem/features.h>
+#include <csystem/standardpaths.h>
 
-int home_dir(char *buf) {
+int cs_home_dir(char *buf) {
 
   const char *dir = getenv("HOME");
 
@@ -25,7 +26,7 @@ int home_dir(char *buf) {
 
 static int append_home(char *buffer, const char *path, size_t size) {
   int len = 0;
-  if (!(len = home_dir(buffer))) {
+  if (!(len = cs_home_dir(buffer))) {
     return 0;
   }
   if (!memcpy(buffer + len, path, size)) {
@@ -34,7 +35,7 @@ static int append_home(char *buffer, const char *path, size_t size) {
   return len + size;
 }
 
-int config_dir(char *buffer) {
+int cs_config_dir(char *buffer) {
   char *data = NULL;
 #if defined(PLATFORM_LINUX)
   char *config = getenv("XDG_CONFIG_HOME");
@@ -50,7 +51,7 @@ int config_dir(char *buffer) {
   return 0;
 }
 
-int temp_dir(char *buffer) {
+int cs_temp_dir(char *buffer) {
 
 #if defined(PLATFORM_UNIX)
   char *tmpDir = getenv("TMPDIR");
@@ -67,7 +68,7 @@ int temp_dir(char *buffer) {
   return 0;
 }
 
-int data_dir(char *buffer) {
+int cs_data_dir(char *buffer) {
   char *data = NULL;
 #if defined(PLATFORM_LINUX)
   char *config = getenv("XDG_DATA_HOME");
@@ -82,7 +83,7 @@ int data_dir(char *buffer) {
   return 0;
 }
 
-int cache_dir(char *buffer) {
+int cs_cache_dir(char *buffer) {
   char *data = NULL;
 #if defined(PLATFORM_LINUX)
   char *config = getenv("XDG_CACHE_HOME");
@@ -97,9 +98,9 @@ int cache_dir(char *buffer) {
   return 0;
 }
 
-int app_data_dir(char *buffer, const char *app_name) {
+int cs_app_data_dir(char *buffer, const char *app_name) {
   int len = 0;
-  if (!(len = data_dir(buffer))) {
+  if (!(len = cs_data_dir(buffer))) {
     return 0;
   }
   buffer[len] = '/';

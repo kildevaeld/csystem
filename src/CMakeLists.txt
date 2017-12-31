@@ -1,6 +1,7 @@
 
 set(SOURCES
-    paths.c
+    standardpaths.c
+    path.c
 )
 
 add_library(csystem ${SOURCES})

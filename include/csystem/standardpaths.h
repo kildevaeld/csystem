@@ -11,12 +11,7 @@ char *cs_gethomedir(char *buffer, size_t maxlen);
 char *cs_getconfigdir(char *buffer, size_t maxlen);
 char *cs_getdatadir(char *buffer, size_t maxlen);
 char *cs_getcachedir(char *buffer, size_t maxlen);
-
-// int cs_home_dir(char *buffer);
-// int cs_config_dir(char *buffer);
-int cs_temp_dir(char *buffer);
-// int cs_data_dir(char *buffer);
-// int cs_cache_dir(char *buffer);
+char *cs_gettmpdir(char *buffer, size_t maxlen);
 
 #ifdef __cplusplus
 }

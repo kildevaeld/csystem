@@ -3,6 +3,10 @@ project(csystem)
 
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
+set (CSYSTEM_VERSION_MAJOR 0)
+set (CSYSTEM_VERSION_MINOR 0)
+set (CSYSTEM_VERSION_PATCH 1)
+
 
 option(CS_EXAMPLE "build example" off)
 

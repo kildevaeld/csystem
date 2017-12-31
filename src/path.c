@@ -32,3 +32,28 @@ int cs_path_join(char *buffer, const char **paths) {
 
   return len;
 }
+
+int cs_path_base(const char *path, int *idx) {
+  int strl = strlen(path);
+  int counter = strl;
+  int len = strl;
+  while (counter-- >= 0) {
+    if (path[counter] == CS_PATH_SEPARATOR) {
+      *idx = counter + 1;
+      len = strl - *idx;
+      break;
+    }
+  }
+
+  return len;
+}
+
+int cs_path_dir(const char *path) {
+  int len = strlen(path);
+  for (int i = 0; i < len; i++) {
+    if (i != 0 && path[i] == CS_PATH_SEPARATOR) {
+      return i;
+    }
+  }
+  return 0;
+}

@@ -16,5 +16,11 @@ int main() {
   cs_path_join(buf, (const char *[]){"Hello/", "/world", NULL});
   printf("buf: %s\n", buf);
 
+  int index;
+  char *path = "/test/png.js";
+  int len = cs_path_base(path, &index);
+
+  printf("base %s\n", path + index);
+
   return 0;
 }

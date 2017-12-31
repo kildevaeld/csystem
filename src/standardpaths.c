@@ -13,6 +13,8 @@
 #include <direct.h>
 #endif
 
+#define ERR_NOT_FOUND 5040
+
 char *cs_getcwd(char *buffer, size_t maxlen) {
 #if defined CS_PLATFORM_UNIX
   return getcwd(buffer, maxlen);
@@ -20,6 +22,22 @@ char *cs_getcwd(char *buffer, size_t maxlen) {
   return _getcwd(buffer, maxlen);
 #endif
   return NULL;
+}
+
+static size_t home_len() {
+  char *dir = getenv("HOME");
+  struct passwd *pw;
+  if (!dir) {
+    uid_t uid = getuid();
+    pw = getpwuid(uid);
+
+    if (pw == NULL) {
+      return -1;
+    }
+    dir = pw->pw_dir;
+  }
+
+  return strlen(dir);
 }
 
 char *cs_gethomedir(char *buffer, size_t maxlen) {
@@ -86,26 +104,7 @@ static int append_home(char *buffer, const char *path, size_t size) {
   }
   return len + size;
 }
-
-static char *append_home2(char *buffer, size_t maxlen, const char *path,
-                          size_t size) {
-
-  if (!(buffer = cs_gethomedir(buffer, maxlen))) {
-    return NULL;
-  }
-
-  size_t len = strlen(buffer);
-
-  /*int len = 0;
-  if (!(len = cs_home_dir(buffer))) {
-    return 0;
-  }
-  if (!memcpy(buffer + len, path, size)) {
-    return 0;
-  }
-  return len + size;*/
-}
-
+/*
 int cs_config_dir(char *buffer) {
   char *data = NULL;
 #if defined(CS_PLATFORM_LINUX)
@@ -120,6 +119,103 @@ int cs_config_dir(char *buffer) {
 #endif
 
   return 0;
+}*/
+
+static char *from_env(const char *name, char *buffer, size_t maxlen) {
+  char *config = getenv("XDG_CONFIG_HOME");
+  if (!config) {
+    errno = ERR_NOT_FOUND;
+    return NULL;
+  }
+
+  size_t len = strlen(config);
+
+  if ((buffer && len > maxlen) || (maxlen != 0 && len > maxlen))
+    if (len > maxlen) {
+      errno = ERANGE;
+      return NULL;
+    }
+
+  if (!buffer) {
+    buffer = (char *)malloc(len + 1);
+    if (!buffer)
+      return NULL;
+  }
+
+  return strcpy(buffer, config);
+}
+
+static char *append_home2(char *buffer, size_t maxlen, const char *path,
+                          size_t size) {
+
+  size_t hlen = home_len();
+  size_t len = hlen + size;
+  int c = 0;
+
+  if ((buffer && len > maxlen) || (maxlen != 0 && len > maxlen))
+    if (len > maxlen) {
+      errno = ERANGE;
+      return NULL;
+    }
+
+  if (buffer == NULL) {
+    buffer = malloc(len + 1);
+    if (!buffer)
+      return NULL;
+    c = 1;
+  }
+
+  if (!(buffer = cs_gethomedir(buffer, len))) {
+    if (c)
+      free(buffer);
+    return NULL;
+  }
+
+  if (!memcpy(buffer + hlen, path, size)) {
+    if (c)
+      free(buffer);
+    return NULL;
+  }
+
+  buffer[len] = '\0';
+
+  return buffer;
+}
+
+char *cs_getconfigdir(char *buffer, size_t maxlen) {
+#if defined(CS_PLATFORM_LINUX)
+  char *config = from_env("XDG_CONFIG_HOME", buffer, maxlen);
+  if (!config && errno == ERR_NOT_FOUND) {
+    config = append_home2(buffer, maxlen, "/.config", 8);
+  }
+  return config;
+#elif defined(CS_PLATFORM_DARWIN)
+  return append_home2(buffer, maxlen, "/Library/Preferences", 20);
+#endif
+}
+
+char *cs_getdatadir(char *buffer, size_t maxlen) {
+#if defined(CS_PLATFORM_LINUX)
+  char *config = from_env("XDG_DATA_HOME", buffer, maxlen);
+  if (!config && errno == ERR_NOT_FOUND) {
+    config = append_home2(buffer, maxlen, "/.local/share", 13);
+  }
+  return config;
+#elif defined(CS_PLATFORM_DARWIN)
+  return append_home2(buffer, maxlen, "/Library/Application Support", 28);
+#endif
+}
+
+char *cs_getcachedir(char *buffer, size_t maxlen) {
+#if defined(CS_PLATFORM_LINUX)
+  char *config = from_env("XDG_DATA_HOME", buffer, maxlen);
+  if (!config && errno == ERR_NOT_FOUND) {
+    config = append_home2(buffer, maxlen, "/.cache", 7);
+  }
+  return config;
+#elif defined(CS_PLATFORM_DARWIN)
+  return append_home2(buffer, maxlen, "/Library/Caches", 15);
+#endif
 }
 
 int cs_temp_dir(char *buffer) {
@@ -138,7 +234,7 @@ int cs_temp_dir(char *buffer) {
 
   return 0;
 }
-
+/*
 int cs_data_dir(char *buffer) {
   char *data = NULL;
 #if defined(CS_PLATFORM_LINUX)
@@ -177,4 +273,4 @@ int cs_app_data_dir(char *buffer, const char *app_name) {
   buffer[len] = '/';
   strcpy(buffer + len + 1, app_name);
   return len + strlen(app_name);
-}
+}*/

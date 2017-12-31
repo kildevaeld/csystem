@@ -5,11 +5,14 @@
 
 int main() {
 
-  char buf[256];
+  printf("homedir %s\n", cs_gethomedir(NULL, 0));
+  printf("configdir %s\n", cs_getconfigdir(NULL, 0));
+  printf("datadir %s\n", cs_getdatadir(NULL, 0));
+  /*char buf[256];
   cs_home_dir(buf);
   printf("homedir %s\n", buf);
 
-  char *homedir = cs_gethomedir(buf, 256);
+  char *homedir = cs_getconfigdir(buf, 256);
   printf("homedir %s\n", homedir);
   // free(homedir);
 
@@ -33,7 +36,7 @@ int main() {
   strncpy(out, path, len);
   printf("dir %s\n", out);
 
-  printf("CWD %s", cs_getcwd(NULL, 0));
+  printf("CWD %s", cs_getcwd(NULL, 0));*/
 
   return 0;
 }

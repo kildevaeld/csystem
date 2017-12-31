@@ -8,35 +8,6 @@ int main() {
   printf("homedir %s\n", cs_gethomedir(NULL, 0));
   printf("configdir %s\n", cs_getconfigdir(NULL, 0));
   printf("datadir %s\n", cs_getdatadir(NULL, 0));
-  /*char buf[256];
-  cs_home_dir(buf);
-  printf("homedir %s\n", buf);
-
-  char *homedir = cs_getconfigdir(buf, 256);
-  printf("homedir %s\n", homedir);
-  // free(homedir);
-
-  cs_config_dir(buf);
-  printf("config %s\n", buf);
-  cs_temp_dir(buf);
-  printf("temp %s\n", buf);
-  cs_data_dir(buf);
-  printf("data %s\n", buf);
-
-  cs_path_join(buf, (const char *[]){"Hello/", "/world", NULL});
-  printf("buf: %s\n", buf);
-
-  int index;
-  char *path = "/test/png.js";
-  int len = cs_path_base(path, &index);
-  printf("base %s\n", path + index);
-
-  len = cs_path_dir(path);
-  char out[len];
-  strncpy(out, path, len);
-  printf("dir %s\n", out);
-
-  printf("CWD %s", cs_getcwd(NULL, 0));*/
 
   return 0;
 }

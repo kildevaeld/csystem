@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <errno.h>
+
 #if defined(CS_PLATFORM_UNIX)
 #include <unistd.h>
 #elif defined(CS_PLATFORM_WINDOWS)
@@ -19,6 +21,38 @@ char *cs_getcwd(char *buffer, size_t maxlen) {
 #endif
   return NULL;
 }
+
+char *cs_gethomedir(char *buffer, size_t maxlen) {
+
+  char *dir = getenv("HOME");
+  struct passwd *pw;
+  if (!dir) {
+    uid_t uid = getuid();
+    pw = getpwuid(uid);
+
+    if (pw == NULL) {
+      return NULL;
+    }
+    dir = pw->pw_dir;
+  }
+
+  size_t len = strlen(dir);
+
+  if ((buffer && len > maxlen) || (maxlen != 0 && len > maxlen))
+    if (len > maxlen) {
+      errno = ERANGE;
+      return NULL;
+    }
+
+  if (!buffer) {
+    buffer = (char *)malloc(len + 1);
+    if (!buffer)
+      return NULL;
+  }
+
+  return strcpy(buffer, dir);
+}
+
 int cs_home_dir(char *buf) {
 
   char *dir = getenv("HOME");
@@ -51,6 +85,25 @@ static int append_home(char *buffer, const char *path, size_t size) {
     return 0;
   }
   return len + size;
+}
+
+static char *append_home2(char *buffer, size_t maxlen, const char *path,
+                          size_t size) {
+
+  if (!(buffer = cs_gethomedir(buffer, maxlen))) {
+    return NULL;
+  }
+
+  size_t len = strlen(buffer);
+
+  /*int len = 0;
+  if (!(len = cs_home_dir(buffer))) {
+    return 0;
+  }
+  if (!memcpy(buffer + len, path, size)) {
+    return 0;
+  }
+  return len + size;*/
 }
 
 int cs_config_dir(char *buffer) {

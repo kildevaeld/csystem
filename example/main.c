@@ -1,5 +1,6 @@
 #include <csystem/csystem.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main() {
@@ -7,6 +8,11 @@ int main() {
   char buf[256];
   cs_home_dir(buf);
   printf("homedir %s\n", buf);
+
+  char *homedir = cs_gethomedir(buf, 256);
+  printf("homedir %s\n", homedir);
+  // free(homedir);
+
   cs_config_dir(buf);
   printf("config %s\n", buf);
   cs_temp_dir(buf);

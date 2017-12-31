@@ -1,12 +1,10 @@
 #include <csystem/path.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <string.h>
 
 int cs_path_join(char *buffer, const char **paths) {
 
   int len = 0;
-
   while (*paths) {
     const char *x = *paths++;
     int x_len = strlen(x);
@@ -44,7 +42,6 @@ int cs_path_base(const char *path, int *idx) {
       break;
     }
   }
-
   return len;
 }
 

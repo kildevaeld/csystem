@@ -19,8 +19,12 @@ int main() {
   int index;
   char *path = "/test/png.js";
   int len = cs_path_base(path, &index);
-
   printf("base %s\n", path + index);
+
+  len = cs_path_dir(path);
+  char out[len];
+  strncpy(out, path, len);
+  printf("dir %s\n", out);
 
   return 0;
 }

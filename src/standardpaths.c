@@ -1,5 +1,10 @@
 #include <csystem/features.h>
 #include <csystem/standardpaths.h>
+#include <pwd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 int cs_home_dir(char *buf) {
 

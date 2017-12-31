@@ -66,4 +66,4 @@
 #define CS_PLATFORM_UNIX
 #endif
 
-const char *const cs_CS_platform_name;
+const char *const cs_platform_name;

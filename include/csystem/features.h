@@ -52,14 +52,17 @@
 
 #elif defined(BSD)
 #define CS_PLATFORM_NAME "bsd" // FreeBSD, NetBSD, OpenBSD, DragonFly BSD
+#define CS_PLATFORM_BSD
 #endif
 #elif defined(__sun) && defined(__SVR4)
 #define CS_PLATFORM_NAME "solaris" // Oracle Solaris, Open Indiana
+#define CS_PLATFORM_SOLARIS
 #else
 #define CS_PLATFORM_NAME NULL
 #endif
 
-#if defined(CS_PLATFORM_LINUX) || defined(CS_PLATFORM_DARWIN)
+#if defined(CS_PLATFORM_LINUX) || defined(CS_PLATFORM_DARWIN) ||               \
+    defined(CS_PLATFORM_BSD)
 #define CS_PLATFORM_UNIX
 #endif
 

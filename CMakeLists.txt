@@ -10,6 +10,7 @@ set (CSYSTEM_VERSION_PATCH 1)
 
 option(CS_EXAMPLE "build example" off)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
 add_subdirectory(src)
 

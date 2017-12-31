@@ -4,8 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#if defined(CS_PLATFORM_UNIX)
+#include <unistd.h>
+#elif defined(CS_PLATFORM_WINDOWS)
+#include <direct.h>
+#endif
+
+char *cs_getcwd(char *buffer, size_t maxlen) {
+#if defined CS_PLATFORM_UNIX
+  return getcwd(buffer, maxlen);
+#elif
+  return _getcwd(buffer, maxlen);
+#endif
+  return NULL;
+}
 int cs_home_dir(char *buf) {
 
   char *dir = getenv("HOME");

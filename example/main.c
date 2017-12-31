@@ -1,5 +1,6 @@
 #include <csystem/csystem.h>
 #include <stdio.h>
+#include <string.h>
 
 int main() {
 
@@ -25,6 +26,8 @@ int main() {
   char out[len];
   strncpy(out, path, len);
   printf("dir %s\n", out);
+
+  printf("CWD %s", cs_getcwd(NULL, 0));
 
   return 0;
 }

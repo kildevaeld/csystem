@@ -116,20 +116,27 @@ static char *append_home(char *buffer, size_t maxlen, const char *path,
   }
 
   if (!(buffer = cs_gethomedir(buffer, len))) {
-    if (c)
+    /*if (c)
       free(buffer);
-    return NULL;
+    return NULL;*/
+    goto clean;
   }
 
   if (!memcpy(buffer + hlen, path, size)) {
-    if (c)
+    /*if (c)
       free(buffer);
-    return NULL;
+    return NULL;*/
+    goto clean;
   }
 
   buffer[len] = '\0';
 
   return buffer;
+
+clean:
+  if (c)
+    free(buffer);
+  return NULL;
 }
 
 char *cs_getconfigdir(char *buffer, size_t maxlen) {

@@ -70,7 +70,7 @@
 extern "C" {
 #endif
 
-const char *const cs_platform_name;
+// const char *cs_platform_name;
 
 #ifdef __cplusplus
 }

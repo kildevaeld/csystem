@@ -12,16 +12,17 @@
 #include <direct.h>
 #endif
 
-#define ERR_NOT_FOUND 5040
+#define CS_LINUX_GEN(ENV, DEFALUT)                                             \
+  char *config = from_env(ENV), buffer, maxlen);                               \
+  if (!config && errno == ERR_NOT_FOUND) {                                     \
+    config = append_home(buffer, maxlen, DEAFULT, sizeof(DEFAULT));            \
+  }                                                                            \
+  return config;
 
-char *cs_getcwd(char *buffer, size_t maxlen) {
-#if defined CS_PLATFORM_UNIX
-  return getcwd(buffer, maxlen);
-#elif
-  return _getcwd(buffer, maxlen);
-#endif
-  return NULL;
-}
+#define CS_DARWIN_GEN(PATH)                                                    \
+  return append_home(buffer, maxlen, PATH, sizeof(PATH));
+
+#define ERR_NOT_FOUND 5040
 
 static size_t home_len() {
   char *dir = getenv("HOME");
@@ -37,37 +38,6 @@ static size_t home_len() {
   }
 
   return strlen(dir);
-}
-
-char *cs_gethomedir(char *buffer, size_t maxlen) {
-
-  char *dir = getenv("HOME");
-  struct passwd *pw;
-  if (!dir) {
-    uid_t uid = getuid();
-    pw = getpwuid(uid);
-
-    if (pw == NULL) {
-      return NULL;
-    }
-    dir = pw->pw_dir;
-  }
-
-  size_t len = strlen(dir);
-
-  if ((buffer && len > maxlen) || (maxlen != 0 && len > maxlen))
-    if (len > maxlen) {
-      errno = ERANGE;
-      return NULL;
-    }
-
-  if (!buffer) {
-    buffer = (char *)malloc(len + 1);
-    if (!buffer)
-      return NULL;
-  }
-
-  return strcpy(buffer, dir);
 }
 
 static char *from_env(const char *name, char *buffer, size_t maxlen) {
@@ -115,16 +85,10 @@ static char *append_home(char *buffer, size_t maxlen, const char *path,
   }
 
   if (!(buffer = cs_gethomedir(buffer, len))) {
-    /*if (c)
-      free(buffer);
-    return NULL;*/
     goto clean;
   }
 
   if (!memcpy(buffer + hlen, path, size)) {
-    /*if (c)
-      free(buffer);
-    return NULL;*/
     goto clean;
   }
 
@@ -138,39 +102,67 @@ clean:
   return NULL;
 }
 
+char *cs_getcwd(char *buffer, size_t maxlen) {
+#if defined CS_PLATFORM_UNIX
+  return getcwd(buffer, maxlen);
+#elif
+  return _getcwd(buffer, maxlen);
+#endif
+  return NULL;
+}
+
+char *cs_gethomedir(char *buffer, size_t maxlen) {
+
+  char *dir = getenv("HOME");
+  struct passwd *pw;
+  if (!dir) {
+    uid_t uid = getuid();
+    pw = getpwuid(uid);
+
+    if (pw == NULL) {
+      return NULL;
+    }
+    dir = pw->pw_dir;
+  }
+
+  size_t len = strlen(dir);
+
+  if ((buffer && len > maxlen) || (maxlen != 0 && len > maxlen))
+    if (len > maxlen) {
+      errno = ERANGE;
+      return NULL;
+    }
+
+  if (!buffer) {
+    buffer = (char *)malloc(len + 1);
+    if (!buffer)
+      return NULL;
+  }
+
+  return strcpy(buffer, dir);
+}
+
 char *cs_getconfigdir(char *buffer, size_t maxlen) {
 #if defined(CS_PLATFORM_LINUX)
-  char *config = from_env("XDG_CONFIG_HOME", buffer, maxlen);
-  if (!config && errno == ERR_NOT_FOUND) {
-    config = append_home(buffer, maxlen, "/.config", 8);
-  }
-  return config;
+  CS_LINUX_GEN("XDG_CONFIG_HOME", "/.config")
 #elif defined(CS_PLATFORM_DARWIN)
-  return append_home(buffer, maxlen, "/Library/Preferences", 20);
+  CS_DARWIN_GEN("/Library/Preferences")
 #endif
 }
 
 char *cs_getdatadir(char *buffer, size_t maxlen) {
 #if defined(CS_PLATFORM_LINUX)
-  char *config = from_env("XDG_DATA_HOME", buffer, maxlen);
-  if (!config && errno == ERR_NOT_FOUND) {
-    config = append_home(buffer, maxlen, "/.local/share", 13);
-  }
-  return config;
+  CS_LINUX_GEN("XDG_DATA_HOME", "/.local/share");
 #elif defined(CS_PLATFORM_DARWIN)
-  return append_home(buffer, maxlen, "/Library/Application Support", 28);
+  CS_DARWIN_GEN("/Library/Application Support")
 #endif
 }
 
 char *cs_getcachedir(char *buffer, size_t maxlen) {
 #if defined(CS_PLATFORM_LINUX)
-  char *config = from_env("XDG_CACHE_HOME", buffer, maxlen);
-  if (!config && errno == ERR_NOT_FOUND) {
-    config = append_home(buffer, maxlen, "/.cache", 7);
-  }
-  return config;
+  CS_LINUX_GEN("XDG_CACHE_HOME", "/.cache");
 #elif defined(CS_PLATFORM_DARWIN)
-  return append_home(buffer, maxlen, "/Library/Caches", 15);
+  CS_DARWIN_GEN("/Library/Caches")
 #endif
 }
 
@@ -187,3 +179,6 @@ char *cs_gettmpdir(char *buffer, size_t maxlen) {
 
   return NULL;
 }
+
+#undef CS_LINUX_GEN
+#undef CS_DARWIN_GEN

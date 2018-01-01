@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 char *cs_getcwd(char *buffer, size_t maxlen);
-
 char *cs_gethomedir(char *buffer, size_t maxlen);
 char *cs_getconfigdir(char *buffer, size_t maxlen);
 char *cs_getdatadir(char *buffer, size_t maxlen);

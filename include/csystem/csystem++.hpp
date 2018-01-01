@@ -7,7 +7,11 @@ namespace csystem {
 namespace standardpaths {
 
 std::string home();
-}
+std::string config();
+std::string data();
+std::string cache();
+
+} // namespace standardpaths
 
 namespace path {
 

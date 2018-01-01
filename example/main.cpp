@@ -28,5 +28,7 @@ int main() {
   std::cout << csystem::path::basename(path) << std::endl;
   std::cout << csystem::path::dirname(path) << std::endl;
 
+  std::cout << csystem::standardpaths::config() << std::endl;
+
   return 0;
 }

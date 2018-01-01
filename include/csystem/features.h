@@ -66,4 +66,12 @@
 #define CS_PLATFORM_UNIX
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 const char *const cs_platform_name;
+
+#ifdef __cplusplus
+}
+#endif

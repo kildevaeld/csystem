@@ -12,5 +12,4 @@ int cs_path_dir(const char *path);
 
 #ifdef __cplusplus
 }
-
 #endif

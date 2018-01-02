@@ -22,7 +22,8 @@ int main() {
 
   std::cout << csystem::standardpaths::home() << std::endl;
 
-  std::cout << csystem::path::join("/rapper", "workd/", "/test/") << std::endl;
+  std::cout << csystem::path::join("/rapper", "workd/", "../test/")
+            << std::endl;
 
   std::string path = "/rapper/von/dumba";
 
@@ -32,7 +33,6 @@ int main() {
   std::cout << csystem::standardpaths::config() << std::endl;
 
   std::cout << "platform " << cs_platform_name() << std::endl;
-  ;
 
   return 0;
 }

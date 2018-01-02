@@ -1,5 +1,6 @@
 #include <csystem/csystem++.hpp>
 #include <csystem/csystem.h>
+#include <csystem/features.h>
 #include <iostream>
 /*#include <stdio.h>
 
@@ -29,6 +30,9 @@ int main() {
   std::cout << csystem::path::dirname(path) << std::endl;
 
   std::cout << csystem::standardpaths::config() << std::endl;
+
+  std::cout << "platform " << cs_platform_name() << std::endl;
+  ;
 
   return 0;
 }

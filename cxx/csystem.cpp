@@ -1,6 +1,7 @@
 #include <csystem/csystem++.hpp>
 #include <csystem/csystem.h>
 #include <iostream>
+#include <memory>
 
 namespace csystem {
 
@@ -45,18 +46,34 @@ std::string join(std::initializer_list<std::string> &&args) {
   return std::string(buffer, len);
 }
 
+#if defined(CS_HAS_CPP_17)
 std::string_view basename(const std::string &path) {
+#else
+std::string basename(const std::string &path) {
+#endif
   int idx, len;
   if (!(len = cs_path_base(path.c_str(), &idx)))
+#if defined(CS_HAS_CPP_17)
     return std::string_view("");
+#else
+    return std::string("");
+#endif
 
   return path.substr(idx, len);
 }
 
+#if defined(CS_HAS_CPP_17)
 std::string_view dirname(const std::string &path) {
+#else
+std::string dirname(const std::string &path) {
+#endif
   int len;
   if (!(len = cs_path_dir(path.c_str())))
+#if defined(CS_HAS_CPP_17)
     return std::string_view("");
+#else
+    return std::string("");
+#endif
 
   return path.substr(0, len);
 }

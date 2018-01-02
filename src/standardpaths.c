@@ -12,10 +12,10 @@
 #include <direct.h>
 #endif
 
-#define CS_LINUX_GEN(ENV, DEFALUT)                                             \
-  char *config = from_env(ENV), buffer, maxlen);                               \
+#define CS_LINUX_GEN(ENV, DEFAULT)                                             \
+  char *config = from_env(ENV, buffer, maxlen);                                \
   if (!config && errno == ERR_NOT_FOUND) {                                     \
-    config = append_home(buffer, maxlen, DEAFULT, sizeof(DEFAULT));            \
+    config = append_home(buffer, maxlen, DEFAULT, sizeof(DEFAULT));            \
   }                                                                            \
   return config;
 
@@ -171,7 +171,7 @@ char *cs_gettmpdir(char *buffer, size_t maxlen) {
   if (!(buffer = from_env("TMPDIR", buffer, maxlen)) && errno == ERR_NOT_FOUND)
     if (!(buffer = from_env("TEMP", buffer, maxlen)) && errno == ERR_NOT_FOUND)
       if (!(buffer = from_env("TMP", buffer, maxlen)) && errno == ERR_NOT_FOUND)
-        return NULL;
+        return "/tmp";
 
   return buffer;
 

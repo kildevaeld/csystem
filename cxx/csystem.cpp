@@ -30,6 +30,11 @@ std::string tmpdir() {
   return std::string(buffer.get());
 }
 
+std::string cwd() {
+  std::unique_ptr<char[]> buffer(cs_getcwd(NULL, 0));
+  return std::string(buffer.get());
+}
+
 } // namespace standardpaths
 
 namespace path {

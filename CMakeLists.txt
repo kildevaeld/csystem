@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(csystem)
 
+
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (CSYSTEM_VERSION_MAJOR 0)

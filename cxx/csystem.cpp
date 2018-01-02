@@ -25,6 +25,11 @@ std::string cache() {
   return std::string(buffer.get());
 }
 
+std::string tmpdir() {
+  std::unique_ptr<char[]> buffer(cs_gettmpdir(NULL, 0));
+  return std::string(buffer.get());
+}
+
 } // namespace standardpaths
 
 namespace path {

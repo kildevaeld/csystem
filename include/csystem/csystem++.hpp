@@ -11,6 +11,7 @@ std::string home();
 std::string config();
 std::string data();
 std::string cache();
+std::string tmpdir();
 
 } // namespace standardpaths
 

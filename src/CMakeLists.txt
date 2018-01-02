@@ -10,8 +10,11 @@ configure_file (
   "${PROJECT_BINARY_DIR}/csystem_config.h"
   )
 
-add_library(csystem ${SOURCES})
-
+if(CS_BUILD_SHARED)
+  add_library(csystem SHARED ${SOURCES})
+else()
+  add_library(csystem STATIC ${SOURCES})
+endif(CS_BUILD_SHARED)
 
 install(TARGETS csystem DESTINATION lib)
 install(DIRECTORY ${PROJECT_ROOT}/include/csystem DESTINATION include)

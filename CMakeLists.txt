@@ -9,6 +9,7 @@ set (CSYSTEM_VERSION_MINOR 0)
 set (CSYSTEM_VERSION_PATCH 2)
 
 option(CS_EXAMPLE "build example" off)
+option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

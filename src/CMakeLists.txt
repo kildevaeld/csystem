@@ -2,6 +2,8 @@
 set(SOURCES
     standardpaths.c
     path.c
+    file.c
+    dir.c
     features.c
 )
 

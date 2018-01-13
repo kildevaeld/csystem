@@ -94,6 +94,7 @@ int cs_path_base(const char *path, int *idx) {
   int strl = strlen(path);
   int counter = strl;
   int len = strl;
+  *idx = 0;
   while (counter-- >= 0) {
     if (path[counter] == CS_PATH_SEPARATOR) {
       *idx = counter + 1;
@@ -112,6 +113,21 @@ int cs_path_dir(const char *path) {
     }
   }
   return 0;
+}
+
+int cs_path_ext(const char *path, int *idx) {
+  int _idx;
+  int len = cs_path_base(path, &_idx);
+  if (len == 0)
+    return 0;
+  char *p = path + _idx;
+  for (int i = 0; i < len; i++) {
+    if (i != 0 && p[i] == '.') {
+      *idx = _idx + i;
+      break;
+    }
+  }
+  return len - (*idx);
 }
 
 char *cs_path_resolve(char *buffer, char *path) { return NULL; }

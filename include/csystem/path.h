@@ -14,6 +14,8 @@ extern "C" {
  */
 char *cs_path_join(char *buffer, ...);
 char *cs_path_join_array(char *buffer, const char **paths);
+int cs_path_is_abs(const char *path);
+char *cs_path_abs(const char *path, char *buffer, int maxlen);
 
 int cs_path_base(const char *path, int *idx);
 int cs_path_dir(const char *path);

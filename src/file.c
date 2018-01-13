@@ -2,6 +2,7 @@
 #include <csystem/file.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 /*#if defined(CS_PLATFORM_UNIX)
 #include <sys/stat.h>
@@ -23,6 +24,11 @@ int cs_file_stat(const char *path) {
   return string_size;
 }*/
 
+int cs_file_exists(const char *filename) {
+  struct stat buffer;
+  return (stat(filename, &buffer) == 0) ? 1 : 0;
+}
+
 int cs_file_size(const char *filename) {
   int string_size = -1;
   FILE *handler = fopen(filename, "r");
@@ -38,8 +44,7 @@ int cs_file_size(const char *filename) {
 
   return string_size;
 }
-char *cs_read_file(const char *filename, char *buffer, size_t maxlen,
-                   size_t *len) {
+char *cs_read_file(const char *filename, char *buffer, int maxlen, int *len) {
   buffer = NULL;
   int c = 0;
   int string_size, read_size;

@@ -19,6 +19,9 @@ static int normalize(const char *segment, int strip_first, int *idx) {
   if (!strip_first && segment[0] == CS_PATH_SEPARATOR)
     i--;
 
+  if (strncmp(segment + i, "./", 2) == 0)
+    i += 2;
+
   *idx = i;
 
   if (segment[c_ln - 1] == CS_PATH_SEPARATOR) {
@@ -131,6 +134,39 @@ fail:
   return NULL;
 }
 
+int cs_path_is_abs(const char *path) {
+  if (path == NULL)
+    return 0;
+  if (strlen(path) == 0)
+    return 0;
+  return path[0] == '/' ? 1 : 0;
+}
+
+char *cs_path_abs(const char *path, char *buffer, int maxlen) {
+  int c = 0;
+  if (buffer == NULL) {
+    buffer = malloc(sizeof(char) * PATH_MAX);
+    c = 1;
+  }
+
+  char cwdBuf[PATH_MAX];
+  if (!(cs_getcwd(cwdBuf, PATH_MAX))) {
+    goto fail;
+  }
+  if (!(cs_path_join(buffer, cwdBuf, path, NULL))) {
+    goto fail;
+  }
+
+  return buffer;
+
+fail:
+
+  if (c)
+    free(buffer);
+
+  return NULL;
+}
+
 int cs_path_base(const char *path, int *idx) {
   int strl = strlen(path);
   int counter = strl;
@@ -147,17 +183,18 @@ int cs_path_base(const char *path, int *idx) {
 }
 
 int cs_path_dir(const char *path) {
-  int len = strlen(path);
+  /*int len = strlen(path);
   for (int i = 0; i < len; i++) {
     if (i != 0 && path[i] == CS_PATH_SEPARATOR) {
       return i;
     }
   }
-  return 0;
+  return 0;*/
+  return cs_str_last_indexof(path, CS_PATH_SEPARATOR);
 }
 
 int cs_path_ext(const char *path, int *idx) {
-  int _idx;
+  int _idx = -1;
   int len = cs_path_base(path, &_idx);
   if (len == 0)
     return 0;
@@ -168,6 +205,8 @@ int cs_path_ext(const char *path, int *idx) {
       break;
     }
   }
+  if (*idx == -1)
+    return 0;
   return len - (*idx);
 }
 

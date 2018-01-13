@@ -1,8 +1,9 @@
 #include <csystem/string.h>
+#include <string.h>
 
 size_t cs_str_indexof(const char *path, char p) {
   int len = strlen(path);
-  return cs_str_indexof(path, len, p);
+  return cs_lstr_indexof(path, len, p);
 }
 
 size_t cs_lstr_indexof(const char *path, size_t size, char p) {

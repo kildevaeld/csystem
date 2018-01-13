@@ -1,93 +1,134 @@
 #include <csystem/features.h>
 #include <csystem/path.h>
+#include <csystem/string.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
 static int normalize(const char *segment, int strip_first, int *idx) {
-  int x_len = strlen(segment);
-  int i = 0;
-  if (x_len == 0)
+  int c_ln = 0;
+  if (segment == NULL || (c_ln = strlen(segment)) == 0)
     return 0;
 
-  if (segment[0] == CS_PATH_SEPARATOR && strip_first) {
-    ++i;
-    --x_len;
-  }
-  if (x_len > 2 && segment[x_len - 1] == CS_PATH_SEPARATOR) {
-    --x_len;
-  }
-  // if (x_len <= 0)
-  // return 0;
+  int i = 0;
+  while (segment[i] == CS_PATH_SEPARATOR && i < c_ln)
+    i++;
+
+  if (!strip_first && segment[0] == CS_PATH_SEPARATOR)
+    i--;
 
   *idx = i;
-  return x_len;
+
+  if (segment[c_ln - 1] == CS_PATH_SEPARATOR) {
+    int l = c_ln;
+    while (segment[--l] == CS_PATH_SEPARATOR && l > 0)
+      c_ln--;
+  }
+
+  return c_ln - i;
 }
 
-/*static int resolve(const char *buffer, char *path, int *buf_len) {
-  int i = 0;
-  int len = 0;
-  for (;;) {
-    if (strncmp(path, "..", 2)) {
-      break;
+static char *resolve(const char *buffer, size_t size, const char *path,
+                     int *idx, int *cidx) {
+  size_t ln = size;
+  size_t i = 0;
+  while (strncmp(path + i, "../", 3) == 0 && ln > 0) {
+    i += 3;
+    ln -= 3;
+    int i = cs_lstr_last_indexof(buffer, ln, CS_PATH_SEPARATOR);
+    if (i) {
+      ln = i + 1;
     }
-
-    *buf_len = cs_path_dir(buffer);
-
-    // int len = cs_path_dir(buffer);
-
-    path = path + 2;
-    int l = 0, idx = 0;
-    if (!(l = normalize(path, 0, &idx))) {
-      continue;
-    }
-    len += l;
-    path = path + idx;
-
-    if (!memcpy(buffer + (*buf_len)++, '/', 1))
-      return 0;
-
-    if (!memcpy(buffer, path + idx, len))
-      return 0;
-
-    i = (*buf_len) +
-
-    // if (!memcpy(buffer, path))
   }
-  return i;
-}*/
+  *idx = ln;
+  *cidx = strlen(path) - i;
+  return path + i;
+}
 
-int cs_path_join(char *buffer, const char **paths) {
+char *cs_path_join(char *buffer, ...) {
+  va_list ap;
+  int c_ln = 0, c_idx = 0, i = 0, ln = 0, c = 0;
 
-  int len = 0;
+  if (buffer == NULL) {
+    buffer = malloc(sizeof(char) * PATH_MAX);
+    c = 1;
+  }
+  char *current = NULL;
+  va_start(ap, buffer);
+  while ((current = va_arg(ap, char *))) {
+    c_ln = normalize(current, i++ > 0 ? 1 : 0, &c_idx);
+    // Empty string
+    if (!c_ln)
+      continue;
+    else if (ln + c_ln >= PATH_MAX) {
+      errno = EFBIG;
+      goto fail;
+    } else if (!ln) {
+      memcpy(buffer + ln, current + c_idx, c_ln);
+    } else if (strncmp(current + c_idx, "..", 2) == 0) {
+      current = resolve(buffer, ln, current + c_idx, &ln, &c_ln);
+      memcpy(buffer + ln, current + c_idx, c_ln);
+    } else {
+      memcpy(ln == 0 ? buffer : buffer + (ln++), "/", 1);
+      memcpy(buffer + ln, current + c_idx, c_ln);
+    }
+
+    ln += c_ln;
+  }
+
+  buffer[ln] = '\0';
+
+  va_end(ap);
+
+  return buffer;
+
+fail:
+  va_end(ap);
+  if (c)
+    free(buffer);
+  return NULL;
+}
+
+char *cs_path_join_array(char *buffer, const char **paths) {
+  int c_ln = 0, c_idx = 0, i = 0, ln = 0, c = 0;
+
+  if (buffer == NULL) {
+    buffer = malloc(sizeof(char) * PATH_MAX);
+    c = 1;
+  }
+
   while (*paths) {
-    const char *x = *paths++;
-
-    int x_len, idx;
-    if (!(x_len = normalize(x, len != 0, &idx))) {
+    const char *current = *paths++;
+    c_ln = normalize(current, i++ > 0 ? 1 : 0, &c_idx);
+    // Empty string
+    if (!c_ln)
       continue;
+    else if (ln + c_ln >= PATH_MAX) {
+      errno = EFBIG;
+      goto fail;
+    } else if (!ln) {
+      memcpy(buffer + ln, current + c_idx, c_ln);
+    } else if (strncmp(current + c_idx, "..", 2) == 0) {
+      current = resolve(buffer, ln, current + c_idx, &ln, &c_ln);
+      memcpy(buffer + ln, current + c_idx, c_ln);
+    } else {
+      memcpy(ln == 0 ? buffer : buffer + (ln++), "/", 1);
+      memcpy(buffer + ln, current + c_idx, c_ln);
     }
 
-    if (len != 0) {
-
-      /*if (strncmp(x + idx, "..", 2) == 0) {
-      }*/
-
-      // Add separator
-      if (buffer[len - 1] != CS_PATH_SEPARATOR)
-        if (!memcpy(buffer + len++, "/", 1)) {
-          return 0;
-        }
-    }
-    if (!memcpy(buffer + len, x + idx, x_len)) {
-      return 0;
-    }
-    len += x_len;
+    ln += c_ln;
   }
 
-  buffer[len] = '\0';
+  buffer[ln] = '\0';
 
-  return len;
+  return buffer;
+
+fail:
+  if (c)
+    free(buffer);
+  return NULL;
 }
 
 int cs_path_base(const char *path, int *idx) {

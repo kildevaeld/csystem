@@ -5,6 +5,7 @@ set(SOURCES
     file.c
     dir.c
     features.c
+    string.c
 )
 
 configure_file (
@@ -17,6 +18,9 @@ if(CS_BUILD_SHARED)
 else()
   add_library(csystem STATIC ${SOURCES})
 endif(CS_BUILD_SHARED)
+
+
+target_include_directories(csystem PUBLIC ${PROJECT_ROOT}/include)
 
 install(TARGETS csystem DESTINATION lib)
 install(DIRECTORY ${PROJECT_ROOT}/include/csystem DESTINATION include)

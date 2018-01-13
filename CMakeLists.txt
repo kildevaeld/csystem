@@ -11,6 +11,7 @@ set (CSYSTEM_VERSION_PATCH 2)
 option(CS_EXAMPLE "build example" off)
 option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
+option(CS_BUILD_TEST "" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
@@ -38,4 +39,8 @@ if(NOT TARGET uninstall)
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
 
-
+if(CS_BUILD_TEST)
+	include(CTest)
+	add_subdirectory(vendor/unity)
+	add_subdirectory(test)
+endif(CS_BUILD_TEST)

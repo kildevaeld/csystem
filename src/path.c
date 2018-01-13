@@ -30,8 +30,8 @@ static int normalize(const char *segment, int strip_first, int *idx) {
   return c_ln - i;
 }
 
-static char *resolve(const char *buffer, size_t size, const char *path,
-                     int *idx, int *cidx) {
+static const char *resolve(const char *buffer, size_t size, const char *path,
+                           int *idx, int *cidx) {
   size_t ln = size;
   size_t i = 0;
   while (strncmp(path + i, "../", 3) == 0 && ln > 0) {
@@ -55,7 +55,7 @@ char *cs_path_join(char *buffer, ...) {
     buffer = malloc(sizeof(char) * PATH_MAX);
     c = 1;
   }
-  char *current = NULL;
+  const char *current = NULL;
   va_start(ap, buffer);
   while ((current = va_arg(ap, char *))) {
     c_ln = normalize(current, i++ > 0 ? 1 : 0, &c_idx);
@@ -161,7 +161,7 @@ int cs_path_ext(const char *path, int *idx) {
   int len = cs_path_base(path, &_idx);
   if (len == 0)
     return 0;
-  char *p = path + _idx;
+  const char *p = path + _idx;
   for (int i = 0; i < len; i++) {
     if (i != 0 && p[i] == '.') {
       *idx = _idx + i;

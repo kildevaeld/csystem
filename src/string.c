@@ -2,7 +2,11 @@
 
 size_t cs_str_indexof(const char *path, char p) {
   int len = strlen(path);
-  for (int i = 0; i < len; i++) {
+  return cs_str_indexof(path, len, p);
+}
+
+size_t cs_lstr_indexof(const char *path, size_t size, char p) {
+  for (int i = 0; i < size; i++) {
     if (path[i] == p)
       return i;
   }

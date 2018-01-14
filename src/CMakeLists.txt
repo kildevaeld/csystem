@@ -3,7 +3,7 @@ set(SOURCES
     standardpaths.c
     path.c
     file.c
-    dir.c
+    #dir.c
     features.c
     string.c
 )

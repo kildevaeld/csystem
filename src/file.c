@@ -45,7 +45,7 @@ int cs_file_size(const char *filename) {
   return string_size;
 }
 char *cs_read_file(const char *filename, char *buffer, int maxlen, int *len) {
-  buffer = NULL;
+  // buffer = NULL;
   int c = 0;
   int string_size, read_size;
   FILE *handler = fopen(filename, "r");
@@ -91,4 +91,16 @@ char *cs_read_file(const char *filename, char *buffer, int maxlen, int *len) {
     *len = string_size;
 
   return buffer;
+}
+
+int cs_write_file(const char *filename, const char *buffer, size_t len) {
+  FILE *file = fopen(filename, "wb");
+  if (file == NULL) {
+    return 0;
+  }
+
+  int ret = fwrite(buffer, sizeof(char), len, file);
+  fclose(file);
+
+  return ret;
 }

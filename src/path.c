@@ -1,5 +1,6 @@
 #include <csystem/features.h>
 #include <csystem/path.h>
+#include <csystem/standardpaths.h>
 #include <csystem/string.h>
 #include <errno.h>
 #include <limits.h>

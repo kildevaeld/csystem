@@ -1,4 +1,5 @@
 #include <csystem/features.h>
+#include <csystem/file.h>
 #include <csystem/path.h>
 #include <csystem/standardpaths.h>
 #include <csystem/string.h>
@@ -155,6 +156,10 @@ char *cs_path_abs(const char *path, char *buffer, int maxlen) {
     goto fail;
   }
   if (!(cs_path_join(buffer, cwdBuf, path, NULL))) {
+    goto fail;
+  }
+
+  if (!cs_file_exists(buffer)) {
     goto fail;
   }
 

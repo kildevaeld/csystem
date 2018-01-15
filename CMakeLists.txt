@@ -6,12 +6,12 @@ set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (CSYSTEM_VERSION_MAJOR 0)
 set (CSYSTEM_VERSION_MINOR 0)
-set (CSYSTEM_VERSION_PATCH 2)
+set (CSYSTEM_VERSION_PATCH 3)
 
 option(CS_EXAMPLE "build example" off)
 option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
-option(CS_BUILD_TEST "" off)
+option(CS_BUILD_TEST "build tests" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)

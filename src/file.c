@@ -4,29 +4,17 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-/*#if defined(CS_PLATFORM_UNIX)
-#include <sys/stat.h>
-#endif
-
-int cs_file_stat(const char *path) {
-  int string_size = -1;
-  FILE *handler = fopen(path, "r");
-
-  if (handler) {
-    // Seek the last byte of the file
-    fseek(handler, 0, SEEK_END);
-    // Offset from the first to the last byte, or in other words, filesize
-    string_size = ftell(handler);
-    // Always remember to close the file.
-    fclose(handler);
-  }
-
-  return string_size;
-}*/
-
-int cs_file_exists(const char *filename) {
+bool cs_file_exists(const char *filename) {
   struct stat buffer;
-  return (stat(filename, &buffer) == 0) ? 1 : 0;
+  return (stat(filename, &buffer) == 0) ? true : false;
+}
+
+bool cs_file_is_dir(const char *filename) {
+  struct stat buffer;
+  if (!stat(filename, &buffer))
+    return false;
+
+  return S_ISDIR(buffer.st_mode);
 }
 
 int cs_file_size(const char *filename) {

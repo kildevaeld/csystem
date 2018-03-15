@@ -84,7 +84,6 @@ std::string dirname(const std::string &path) {
 #else
     return std::string("");
 #endif
-  std::cout << "count " << len << std::endl;
   return path.substr(0, len);
 }
 

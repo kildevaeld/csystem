@@ -20,9 +20,10 @@ size_t cs_str_last_indexof(const char *path, char h) {
 }
 
 size_t cs_lstr_last_indexof(const char *path, size_t len, char h) {
-  while (--len) {
-    if (path[len] == h)
-      return len;
+  int i = len;
+  while (i >= 0) {
+    if (path[--i] == h)
+      return i;
   }
   return -1;
 }

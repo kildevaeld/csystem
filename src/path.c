@@ -189,7 +189,8 @@ int cs_path_base(const char *path, int *idx) {
 }
 
 int cs_path_dir(const char *path) {
-  return cs_str_last_indexof(path, CS_PATH_SEPARATOR);
+  int ret = cs_str_last_indexof(path, CS_PATH_SEPARATOR);
+  return ret == 0 ? 1 : ret;
 }
 
 int cs_path_ext(const char *path, int *idx) {

@@ -12,10 +12,32 @@ option(CS_EXAMPLE "build example" off)
 option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
 option(CS_BUILD_TEST "build tests" off)
+option(CS_BUILD_CRYPTO "build crypto" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
 add_subdirectory(src)
+
+if(CS_BUILD_TEST)
+    set(CS_BUILD_CRYPTO on)
+endif(CS_BUILD_TEST)
+
+
+if((CS_BUILD_CRYPTO) OR (CS_BUILD_TEST))
+    message(STATUS "Building csystem crypto")
+    if (APPLE AND CS_BUILD_SHARED)
+        message("   CommonCrypto")
+        set(CSYSTEM_CRYPTO_COMMONCRYPTO on)
+    else()
+        message("   MbedTLS")
+        set(CSYSTEM_CRYPTO_MBEDTLS on)
+        option(ENABLE_PROGRAMS "Build mbed TLS programs." OFF)
+        option(ENABLE_TESTING "Build mbed TLS tests." OFF)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mbedtls)
+    endif(APPLE AND CS_BUILD_SHARED) 
+    
+    add_subdirectory(src/crypto)
+endif((CS_BUILD_CRYPTO) OR (CS_BUILD_TEST))
 
 
 if((CS_BUILD_CXX) OR (CS_EXAMPLE))
@@ -44,3 +66,4 @@ if(CS_BUILD_TEST)
 	add_subdirectory(vendor/unity)
 	add_subdirectory(test)
 endif(CS_BUILD_TEST)
+

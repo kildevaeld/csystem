@@ -11,7 +11,8 @@
                 "${workspaceRoot}",
                 "${workspaceRoot}/include",
                 "${workspaceRoot}/build",
-                "${workspaceRoot}/vendor/unity/unity-src/src"
+                "${workspaceRoot}/vendor/unity/unity-src/src",
+                "${workspaceRoot}/vendor/mbedtls/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",

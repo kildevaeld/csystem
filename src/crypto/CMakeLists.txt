@@ -15,14 +15,10 @@ if (CSYSTEM_CRYPTO_COMMONCRYPTO)
         crypto-macos.c
     )
     find_library(SECURITY_LIBRARY Security)
-    #set(TARGET_DEFINITIONS CSYSTEM_USE_COMMONCRYPTO)
     set(TARGET_LIBRARIRES ${SECURITY_LIBRARY})
 endif(CSYSTEM_CRYPTO_COMMONCRYPTO)
 
-
-
 set(SOURCES ${SOURCES} crypto.c)
-
 
 add_library(csystem_crypto ${SOURCES})
 target_link_libraries(csystem_crypto ${TARGET_LIBRARIRES})

@@ -1,4 +1,5 @@
 #include <csystem/string.h>
+#include <stdio.h>
 #include <string.h>
 
 size_t cs_str_indexof(const char *path, char p) {
@@ -38,7 +39,6 @@ char *cs_str_hex(const char *str, char *hex, size_t maxlen) {
     if (!hex)
       return NULL;
   } else if ((len * 2) > maxlen) {
-    printf("MAX\n");
     return NULL;
   }
 

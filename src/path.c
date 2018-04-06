@@ -166,7 +166,6 @@ char *cs_path_abs(const char *path, char *buffer, int maxlen) {
   return buffer;
 
 fail:
-
   if (c)
     free(buffer);
 

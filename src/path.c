@@ -209,4 +209,27 @@ int cs_path_ext(const char *path, int *idx) {
   return len - (*idx);
 }
 
-char *cs_path_resolve(char *buffer, char *path) { return NULL; }
+char *cs_path_resolve(const char *path, char *buffer) {
+
+  int c = 0;
+  if (buffer == NULL) {
+    buffer = malloc(sizeof(char) * PATH_MAX);
+    c = 1;
+  }
+
+  char cwdBuf[PATH_MAX];
+  if (!(cs_getcwd(cwdBuf, PATH_MAX))) {
+    goto fail;
+  }
+  if (!(cs_path_join(buffer, cwdBuf, path, NULL))) {
+    goto fail;
+  }
+
+  return buffer;
+
+fail:
+  if (c)
+    free(buffer);
+
+  return NULL;
+}

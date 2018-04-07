@@ -20,7 +20,7 @@ char *cs_path_abs(const char *path, char *buffer, int maxlen);
 int cs_path_base(const char *path, int *idx);
 int cs_path_dir(const char *path);
 int cs_path_ext(const char *path, int *idx);
-char *cs_path_resolve(char *buffer, char *paths);
+char *cs_path_resolve(const char *path, char *buffer);
 
 #ifdef __cplusplus
 }

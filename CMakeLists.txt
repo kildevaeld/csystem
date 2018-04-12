@@ -13,6 +13,7 @@ option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
 option(CS_BUILD_TEST "build tests" off)
 option(CS_BUILD_CRYPTO "build crypto" off)
+option(CS_BUILS_TERMINAL "build term" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
@@ -21,6 +22,10 @@ add_subdirectory(src)
 if(CS_BUILD_TEST)
     set(CS_BUILD_CRYPTO on)
 endif(CS_BUILD_TEST)
+
+if(CS_EXAMPLE)
+    set(CS_BUILD_TERMINAL on)
+endif(CS_EXAMPLE)
 
 
 if((CS_BUILD_CRYPTO) OR (CS_BUILD_TEST))
@@ -51,6 +56,10 @@ if((CS_BUILD_CRYPTO) OR (CS_BUILD_TEST))
     add_subdirectory(src/crypto)
 endif((CS_BUILD_CRYPTO) OR (CS_BUILD_TEST))
 
+
+if (CS_BUILD_TERMINAL)
+    add_subdirectory(src/terminal)
+endif(CS_BUILD_TERMINAL)
 
 if((CS_BUILD_CXX) OR (CS_EXAMPLE))
     set(CMAKE_CXX_STANDARD 14)

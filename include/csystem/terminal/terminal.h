@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 enum cs_term_control_keys_t {
+  BACKSPACE = 127,
   ARROW_LEFT = 1000,
   ARROW_RIGHT,
   ARROW_UP,
@@ -10,7 +11,7 @@ enum cs_term_control_keys_t {
   HOME_KEY,
   END_KEY,
   PAGE_UP,
-  PAGE_DOWN
+  PAGE_DOWN,
 };
 
 bool cs_term_enable_raw_mode();

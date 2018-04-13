@@ -3,10 +3,14 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 
-#define CTRL_KEY(k) ((k)&0x1f)
+#define ESCAPE_CHARACTER '\x1b'
+
+#define ESCAPE(x) ("\x1b[" x)
 
 struct Terminal {
   struct termios orig_termios;
@@ -25,7 +29,7 @@ bool cs_term_disable_raw_mode() {
 bool cs_term_enable_raw_mode() {
   if (tcgetattr(STDIN_FILENO, &T.orig_termios) == -1)
     return false;
-  atexit(cs_term_disable_raw_mode);
+  atexit((void (*)(void))cs_term_disable_raw_mode);
   struct termios raw = T.orig_termios;
   raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
   raw.c_oflag &= ~(OPOST);
@@ -38,7 +42,7 @@ bool cs_term_enable_raw_mode() {
   return true;
 }
 
-void cs_term_clear_screen() { write(STDOUT_FILENO, "\x1b[2J", 4); }
+void cs_term_clear_screen() { write(STDOUT_FILENO, ESCAPE("2J"), 4); }
 
 int cs_term_read_key() {
   int nread;
@@ -47,16 +51,18 @@ int cs_term_read_key() {
     if (nread == -1 && errno != EAGAIN)
       return '\0';
   }
-  if (c == '\x1b') {
+
+  if (c == ESCAPE_CHARACTER) {
+
     char seq[3];
     if (read(STDIN_FILENO, &seq[0], 1) != 1)
-      return '\x1b';
+      return ESCAPE_CHARACTER;
     if (read(STDIN_FILENO, &seq[1], 1) != 1)
-      return '\x1b';
+      return ESCAPE_CHARACTER;
     if (seq[0] == '[') {
       if (seq[1] >= '0' && seq[1] <= '9') {
         if (read(STDIN_FILENO, &seq[2], 1) != 1)
-          return '\x1b';
+          return ESCAPE_CHARACTER;
         if (seq[2] == '~') {
           switch (seq[1]) {
           case '1':
@@ -99,8 +105,14 @@ int cs_term_read_key() {
         return END_KEY;
       }
     }
-    return '\x1b';
+    return ESCAPE_CHARACTER;
   } else {
+    if (iscntrl(c)) {
+      switch (c) {
+      case '\r':
+        return ENTER_KEY;
+      }
+    }
     return c;
   }
 }
@@ -108,7 +120,7 @@ int cs_term_read_key() {
 int cs_term_cursor_pos_get(int *rows, int *cols) {
   char buf[32];
   unsigned int i = 0;
-  if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
+  if (write(STDOUT_FILENO, ESCAPE("6n"), 4) != 4)
     return -1;
   while (i < sizeof(buf) - 1) {
     if (read(STDIN_FILENO, &buf[i], 1) != 1)
@@ -118,18 +130,34 @@ int cs_term_cursor_pos_get(int *rows, int *cols) {
     i++;
   }
   buf[i] = '\0';
-  if (buf[0] != '\x1b' || buf[1] != '[')
+  if (buf[0] != ESCAPE_CHARACTER || buf[1] != '[')
     return -1;
   if (sscanf(&buf[2], "%d;%d", rows, cols) != 2)
     return -1;
   return 0;
 }
 
+#define CS_WRITE(fmt, ...)                                                     \
+  do {                                                                         \
+    char buf[32];                                                              \
+    snprintf(buf, sizeof(buf), fmt, __VA_ARGS__);                              \
+    write(STDOUT_FILENO, buf, strlen(buf));                                    \
+  } while (0)
+
 void cs_term_cursor_pos_set(int row, int col) {
   char buf[32];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", row + 1, col + 1);
+  snprintf(buf, sizeof(buf), ESCAPE("%d;%dH"), row + 1, col + 1);
   write(STDIN_FILENO, buf, strlen(buf));
 }
+
+void cs_term_cursor_up(int n) { CS_WRITE(ESCAPE("%dA"), n); }
+void cs_term_cursor_down(int n) { CS_WRITE(ESCAPE("%dB"), n); }
+void cs_term_cursor_forward(int n) { CS_WRITE(ESCAPE("%dC"), n); }
+void cs_term_cursor_backward(int n) { CS_WRITE(ESCAPE("%dD"), n); }
+void cs_term_erase_line() { write(STDOUT_FILENO, ESCAPE("K"), 3); }
+
+void cs_term_cursor_show() { write(STDOUT_FILENO, "\x1b[?25h", 6); }
+void cs_term_cursor_hide() { write(STDOUT_FILENO, "\x1b[?25l", 6); }
 
 int cs_term_size(int *rows, int *cols) {
   struct winsize ws;

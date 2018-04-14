@@ -50,7 +50,7 @@ std::string join(std::initializer_list<std::string> &&args) {
   arguments[i] = NULL;
   char buffer[size];
   int len;
-  if (!cs_path_join(buffer, arguments))
+  if (!cs_path_join_array(buffer, arguments))
     return std::string("");
 
   return std::string(buffer, len);

@@ -155,6 +155,7 @@ void cs_term_cursor_down(int n) { CS_WRITE(ESCAPE("%dB"), n); }
 void cs_term_cursor_forward(int n) { CS_WRITE(ESCAPE("%dC"), n); }
 void cs_term_cursor_backward(int n) { CS_WRITE(ESCAPE("%dD"), n); }
 void cs_term_erase_line() { write(STDOUT_FILENO, ESCAPE("K"), 3); }
+void cs_term_erase_current_line() { write(STDOUT_FILENO, ESCAPE("2K"), 4); }
 
 void cs_term_cursor_show() { write(STDOUT_FILENO, "\x1b[?25h", 6); }
 void cs_term_cursor_hide() { write(STDOUT_FILENO, "\x1b[?25l", 6); }

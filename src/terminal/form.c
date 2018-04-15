@@ -74,3 +74,39 @@ end:
   cs_term_disable_raw_mode();
   return i;
 }
+
+bool cs_term_form_confirm(const char *msg, bool clear) {
+  cs_term_enable_raw_mode();
+
+  char buf[strlen(msg) + 3];
+  snprintf(buf, strlen(msg) + 3, "%s ", msg);
+  write(STDOUT_FILENO, buf, strlen(buf));
+  bool ret = false;
+  char *result = NULL;
+  while (1) {
+    int c = cs_term_read_key();
+
+    switch (c) {
+    case 'y':
+      ret = true;
+      result = "yes\r\n";
+      goto end;
+    case 'n':
+      result = "no\r\n";
+      goto end;
+    }
+  }
+
+end:
+
+  if (clear) {
+    cs_term_erase_current_line();
+    write(STDOUT_FILENO, "\r", 1);
+  } else {
+    write(STDOUT_FILENO, result, strlen(result));
+  }
+
+  cs_term_disable_raw_mode();
+
+  return ret;
+}

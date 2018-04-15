@@ -40,6 +40,7 @@ void cs_term_cursor_down(int n);
 void cs_term_cursor_forward(int n);
 void cs_term_cursor_backward(int n);
 void cs_term_erase_line();
+void cs_term_erase_current_line();
 void cs_term_cursor_show();
 void cs_term_cursor_hide();
 

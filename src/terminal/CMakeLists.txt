@@ -3,7 +3,10 @@
 
 
 
-set(SOURCES ${SOURCES} terminal.c)
+set(SOURCES ${SOURCES} 
+    terminal.c
+    form.c
+)
 
 add_library(csystem_terminal ${SOURCES})
 #target_link_libraries(csystem_terminal ${TARGET_LIBRARIRES})

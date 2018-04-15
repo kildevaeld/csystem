@@ -48,12 +48,16 @@ std::string join(std::initializer_list<std::string> &&args) {
     size = a.size() + 1;
   }
   arguments[i] = NULL;
-  char buffer[size];
+  char buffer[size + 10];
   int len;
-  if (!cs_path_join_array(buffer, arguments))
-    return std::string("");
 
-  return std::string(buffer, len);
+  char *data = cs_path_join_array(NULL, arguments);
+  if (!data)
+    return "";
+
+  std::string path(data);
+  free(data);
+  return data;
 }
 
 #if defined(CS_HAS_CPP_17)

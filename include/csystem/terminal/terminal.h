@@ -1,5 +1,12 @@
 #pragma once
+
 #include <stdbool.h>
+//#include <termios.h>
+#include <unistd.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define CS_CTRL_KEY(k) ((k)&0x1f)
 
@@ -37,3 +44,7 @@ void cs_term_cursor_show();
 void cs_term_cursor_hide();
 
 int cs_term_size(int *rows, int *cols);
+
+#ifdef __cplusplus
+}
+#endif

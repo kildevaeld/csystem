@@ -110,3 +110,7 @@ end:
 
   return ret;
 }
+
+char *cs_term_form_input(const char *msg) {
+  
+}

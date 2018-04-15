@@ -1,4 +1,5 @@
 #include <csystem/string.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -145,4 +146,106 @@ char *cs_str_hex_str(const char *str, char *hex, size_t maxlen) {
     tmp = tmp + 2;
   }
   return hex;
+}
+
+#define CS_STR_BLOCK_SIZE 256
+
+typedef struct cs_string_t {
+  char *data;
+  size_t len;
+  size_t alloc;
+} cs_string_t;
+
+static bool alloc_atleast(cs_string_t *str, size_t len);
+
+cs_string_t *cs_str_alloc() {
+  cs_string_t *str = (cs_string_t *)malloc(sizeof(cs_string_t));
+  if (!str)
+    return NULL;
+
+  str->data = malloc(sizeof(char) * CS_STR_BLOCK_SIZE);
+  str->alloc = CS_STR_BLOCK_SIZE;
+  str->len = 0;
+
+  return str;
+}
+void cs_str_free(cs_string_t *str) {
+  if (!str)
+    return;
+
+  free(str->data);
+  str->data = NULL;
+  free(str);
+}
+
+static bool alloc_atleast(cs_string_t *str, size_t len) {
+  if (len < str->len)
+    return true;
+  int i = len % CS_STR_BLOCK_SIZE;
+  int nsize = i * CS_STR_BLOCK_SIZE;
+
+  char *data = realloc(str->data, nsize);
+  if (!data) {
+    return false;
+  }
+  str->data = data;
+  str->alloc = nsize;
+
+  return true;
+}
+
+void cs_str_append(cs_string_t *str, const char *s) {
+
+  size_t len = strlen(s);
+  size_t nlen = len + str->len;
+
+  if (nlen >= str->alloc) {
+    if (!alloc_atleast(str, nlen)) {
+      return;
+    }
+  }
+
+  memcpy(str->data + str->len, s, len);
+  str->len = nlen;
+}
+
+void cs_str_insert(cs_string_t *str, size_t idx, const char *s) {
+  if (idx >= str->len)
+    return;
+
+  int len = strlen(s);
+  int nlen = str->len + len;
+  if (!alloc_atleast(str, nlen)) {
+    return;
+  }
+  int l = str->len - idx;
+  char tmp[l];
+  memcpy(tmp, str->data + idx, l);
+  memcpy(str->data + idx, s, len);
+  memcpy(str->data + idx + len, tmp, l);
+  str->len = nlen;
+}
+
+void cs_str_remove(cs_string_t *str, size_t idx, size_t len) {
+  if (idx + len >= str->len) {
+    str->len = idx;
+    return;
+  }
+  char *ptr = idx > 0 ? str->data + idx : str->data;
+  memcpy(ptr, str->data + (idx) + len, str->len - (idx + len));
+  str->len -= len;
+}
+
+size_t cs_str_len(cs_string_t *str) { return str->len; }
+
+void cs_str_copy(cs_string_t *str, char *buf) {
+  memcpy(buf, str->data, str->len);
+  buf[str->len] = '\0';
+}
+
+char *cs_str_string(cs_string_t *str) {
+  char *out = malloc(sizeof(char) * str->len + 1);
+  cs_str_copy(str, out);
+  out[str->len] = '\0';
+  return out;
 }

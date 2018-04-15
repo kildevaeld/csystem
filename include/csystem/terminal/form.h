@@ -9,6 +9,7 @@ extern "C" {
 
 int cs_term_form_list(const char *msg, const char **choices, size_t size);
 bool cs_term_form_confirm(const char *msg, bool clear);
+char *cs_term_form_input(const char *msg);
 
 #ifdef __cplusplus
 }

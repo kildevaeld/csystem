@@ -34,4 +34,10 @@ void test_string() {
   cs_str_copy(str, buf4);
   buf4[cs_str_len(str)] = '\0';
   TEST_ASSERT_EQUAL_STRING("Hello, World. Hello to you too.", buf4);
+
+  printf("stat %lu\n", cs_str_allocs(str));
+
+  cs_str_clear(str);
+  cs_str_compact(str);
+  printf("stat %lu\n", cs_str_allocs(str));
 }

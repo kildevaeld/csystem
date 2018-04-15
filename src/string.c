@@ -1,4 +1,6 @@
 #include <csystem/string.h>
+#include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -148,7 +150,7 @@ char *cs_str_hex_str(const char *str, char *hex, size_t maxlen) {
   return hex;
 }
 
-#define CS_STR_BLOCK_SIZE 256
+#define CS_STR_BLOCK_SIZE 9
 
 typedef struct cs_string_t {
   char *data;
@@ -169,6 +171,7 @@ cs_string_t *cs_str_alloc() {
 
   return str;
 }
+
 void cs_str_free(cs_string_t *str) {
   if (!str)
     return;
@@ -179,9 +182,7 @@ void cs_str_free(cs_string_t *str) {
 }
 
 static bool alloc_atleast(cs_string_t *str, size_t len) {
-  if (len < str->len)
-    return true;
-  int i = len % CS_STR_BLOCK_SIZE;
+  int i = ceil(len / CS_STR_BLOCK_SIZE);
   int nsize = i * CS_STR_BLOCK_SIZE;
 
   char *data = realloc(str->data, nsize);
@@ -209,15 +210,31 @@ void cs_str_append(cs_string_t *str, const char *s) {
   str->len = nlen;
 }
 
+void cs_str_appendf(cs_string_t *str, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  char *out;
+  if (vasprintf(&out, fmt, args) == -1) {
+    return;
+  }
+  va_end(args);
+  cs_str_append(str, out);
+  free(args);
+}
+
 void cs_str_insert(cs_string_t *str, size_t idx, const char *s) {
   if (idx >= str->len)
     return;
 
   int len = strlen(s);
   int nlen = str->len + len;
-  if (!alloc_atleast(str, nlen)) {
-    return;
+
+  if (nlen >= str->alloc) {
+    if (!alloc_atleast(str, nlen)) {
+      return;
+    }
   }
+
   int l = str->len - idx;
   char tmp[l];
   memcpy(tmp, str->data + idx, l);
@@ -236,11 +253,24 @@ void cs_str_remove(cs_string_t *str, size_t idx, size_t len) {
   str->len -= len;
 }
 
+void cs_str_clear(cs_string_t *str) {
+  str->len = 0;
+  memset(str->data, 0, str->alloc);
+}
+void cs_str_compact(cs_string_t *str) {
+  int len = str->len;
+  if (0 == len) {
+    len = CS_STR_BLOCK_SIZE;
+  }
+  alloc_atleast(str, len);
+}
+
 size_t cs_str_len(cs_string_t *str) { return str->len; }
+
+size_t cs_str_allocs(cs_string_t *str) { return str->alloc; }
 
 void cs_str_copy(cs_string_t *str, char *buf) {
   memcpy(buf, str->data, str->len);
-  buf[str->len] = '\0';
 }
 
 char *cs_str_string(cs_string_t *str) {

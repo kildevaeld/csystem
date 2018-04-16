@@ -51,9 +51,14 @@ int cs_term_read_key() {
     if (nread == -1 && errno != EAGAIN)
       return '\0';
   }
+  
+  const char *buf = 0xc0 == (0xe0 & c) ? "1" : "0";
+  bool is_unicode =0xc0 == (0xe0 & c);
+
+  //write(STDOUT_FILENO, buf, 1);
 
   if (c == ESCAPE_CHARACTER) {
-
+    
     char seq[3];
     if (read(STDIN_FILENO, &seq[0], 1) != 1)
       return ESCAPE_CHARACTER;
@@ -107,12 +112,18 @@ int cs_term_read_key() {
     }
     return ESCAPE_CHARACTER;
   } else {
+    
     if (iscntrl(c)) {
+      
       switch (c) {
       case '\r':
         return ENTER_KEY;
       }
-    }
+    } /*else if (is_unicode) {
+      write(STDOUT_FILENO, "U\n\r", 3);
+      return UNICODE_4C;
+    }*/
+    //write(STDOUT_FILENO, "H\n\r", 3);
     return c;
   }
 }

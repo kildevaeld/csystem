@@ -8,7 +8,12 @@
 extern "C" {
 #endif
 
+//0xc0 == (0xe0 & c)
+
 #define CS_CTRL_KEY(k) ((k)&0x1f)
+#define CS_UTF8_4C(k) (0xf0 == (0xf8&(k)))
+#define CS_UTF8_3C(k) (0xe0 == (0xf0&(k)))
+#define CS_UTF8_2C(k) (0xc0 == (0xe0&(k)))
 
 enum cs_term_control_keys_t {
   ENTER_KEY = 13,
@@ -21,7 +26,11 @@ enum cs_term_control_keys_t {
   HOME_KEY,
   END_KEY,
   PAGE_UP,
-  PAGE_DOWN
+  PAGE_DOWN,
+
+  UNICODE_4C,
+  UNICODE_3C,
+  UNICODE_2C
 };
 
 bool cs_term_enable_raw_mode();

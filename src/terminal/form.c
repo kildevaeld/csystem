@@ -171,7 +171,7 @@ char *cs_term_form_input(const char *msg) {
       break;
     default: {
       cs_str_insert_char(str, cur - 1, key);
-      print_input(str, row, cur);
+      // print_input(str, row, cur);
       cur++;
     }
     }

@@ -356,19 +356,51 @@ static size_t nearest_index(cs_string_t *str, size_t idx) {
   return i;
 }
 
-void cs_str_utf8_append(cs_string_t *str, const char *buf) {}
-void cs_str_utf8_appendf(cs_string_t *str, const char *fmt, ...) {}
+void cs_str_utf8_append(cs_string_t *str, const char *buf) {
+  if (utf8valid(buf)) {
+    return;
+  }
+  cs_str_append(str, buf);
+}
+void cs_str_utf8_appendf(cs_string_t *str, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  char *out;
+  if (vasprintf(&out, fmt, args) == -1) {
+    return;
+  }
+  va_end(args);
+  cs_str_utf8_append(str, out);
+  free(out);
+}
+
+static size_t find_index(cs_string_t *str, size_t idx) {
+  size_t i = 0;
+  while (i < str->len) {
+    if (i == idx)
+      return i;
+    if (CS_IS_UTF(str->data[i])) {
+      i += utf_width(str->data[i]);
+    } else {
+      i++;
+    }
+
+    if (i >= idx)
+      return i;
+  }
+  return -1;
+}
 
 int cs_str_utf8_insert(cs_string_t *str, size_t idx, const char *buf) {
   if (utf8valid(buf)) {
     return 0;
   }
 
-  size_t u8len = utf8len(buf);
+  size_t u8len = cs_str_utf8_len(str);
 
-  if (idx > str->len) {
+  if (idx > u8len) {
     return 0;
-  } else if (idx == str->len) {
+  } else if (idx == u8len) {
     cs_str_append(str, buf);
     return u8len;
   } else if (idx == 0) {
@@ -376,7 +408,7 @@ int cs_str_utf8_insert(cs_string_t *str, size_t idx, const char *buf) {
     return u8len;
   }
 
-  size_t i = nearest_index(str, idx);
+  size_t i = find_index(str, idx);
   cs_str_insert(str, i, buf);
 
   return u8len;
@@ -384,9 +416,11 @@ int cs_str_utf8_insert(cs_string_t *str, size_t idx, const char *buf) {
 
 int cs_str_utf8_insert_char(cs_string_t *str, size_t idx, char c) {
 
-  if (idx > str->len) {
+  size_t len = cs_str_utf8_len(str);
+
+  if (idx > len) {
     return 0;
-  } else if (idx == str->len) {
+  } else if (idx == len) {
     cs_str_append_char(str, c);
     return 1;
   } else if (idx == 0) {
@@ -394,38 +428,38 @@ int cs_str_utf8_insert_char(cs_string_t *str, size_t idx, char c) {
     return 1;
   }
 
-  size_t i = nearest_index(str, idx);
+  size_t i = find_index(str, idx);
   cs_str_insert_char(str, i, c);
 
   return 1;
 }
 
-int cs_str_utf8_remove(cs_string_t *str, size_t idx, size_t len) {}
+int cs_str_utf8_remove(cs_string_t *str, size_t idx, size_t len) {
+  if (idx >= str->len)
+    return 0;
+
+  if (idx != 0) {
+    idx = find_index(str, idx);
+  }
+
+  size_t eidx = find_index(str, idx + len + 1);
+  size_t nlen = eidx - idx;
+  printf("%i %i %i\n", idx, eidx, nlen);
+  cs_str_remove(str, idx, nlen);
+
+  return 1;
+}
 
 size_t cs_str_utf8_len(cs_string_t *str) {
   const unsigned char *s = str->data;
   size_t length = 0;
-
-  while ('\0' != *s) {
-    /*if (0xf0 == (0xf8 & *s)) {
-      // 4-byte utf8 code point (began with 0b11110xxx)
-      s += 4;
-    } else if (0xe0 == (0xf0 & *s)) {
-      // 3-byte utf8 code point (began with 0b1110xxxx)
-      s += 3;
-    } else if (0xc0 == (0xe0 & *s)) {
-      // 2-byte utf8 code point (began with 0b110xxxxx)
-      s += 2;
-    } else { // if (0x00 == (0x80 & *s)) {
-      // 1-byte ascii (began with 0b0xxxxxxx)
-      s += 1;
-    }*/
-    if (CS_IS_UTF(*s)) {
-      s += utf_width(*s);
+  size_t i = 0;
+  while (i < str->len) {
+    if (CS_IS_UTF(str->data[i])) {
+      i += utf_width(str->data[i]);
+    } else {
+      i++;
     }
-
-    // no matter the bytes we marched s forward by, it was
-    // only 1 utf8 codepoint
     length++;
   }
 

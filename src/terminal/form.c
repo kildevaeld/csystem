@@ -88,6 +88,7 @@ bool cs_term_form_confirm(const char *msg, bool clear) {
     int c = cs_term_read_key();
 
     switch (c) {
+    case 'j':
     case 'y':
       ret = true;
       result = "yes\r\n";

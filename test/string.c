@@ -40,4 +40,10 @@ void test_string() {
   cs_str_clear(str);
   cs_str_compact(str);
   printf("stat %lu\n", cs_str_allocs(str));
+
+  cs_str_append(str, "Hello");
+  TEST_ASSERT_EQUAL(5, cs_str_len(str));
+
+  cs_str_remove(str, 4, 2);
+  printf("%s\n", cs_str_string(str));
 }

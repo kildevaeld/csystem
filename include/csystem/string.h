@@ -17,6 +17,7 @@ cs_string_t *cs_str_alloc();
 void cs_str_free(cs_string_t *);
 void cs_str_append(cs_string_t *, const char *);
 void cs_str_appendf(cs_string_t *, const char *fmt, ...);
+void cs_str_append_char(cs_string_t *, char);
 void cs_str_insert(cs_string_t *, size_t idx, const char *);
 void cs_str_remove(cs_string_t *, size_t idx, size_t len);
 void cs_str_clear(cs_string_t *);

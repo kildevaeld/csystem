@@ -210,6 +210,18 @@ void cs_str_append(cs_string_t *str, const char *s) {
   str->len = nlen;
 }
 
+void cs_str_append_char(cs_string_t *str, char c) {
+  size_t nlen = 1 + str->len;
+
+  if (nlen >= str->alloc) {
+    if (!alloc_atleast(str, nlen)) {
+      return;
+    }
+  }
+  str->data[str->len] = c;
+  str->len++;
+}
+
 void cs_str_appendf(cs_string_t *str, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);

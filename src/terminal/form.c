@@ -122,6 +122,23 @@ void print_input(cs_string_t *str, int row, int col) {
   cs_term_cursor_pos_set(row, col);
 }
 
+static void read_n(char *buf, int c) {
+  int i = 0;
+  while (i < c) {
+    buf[i++] = cs_term_read_key();
+  }
+}
+
+static int utf_width(char c) {
+  if (CS_UTF8_2C(c))
+    return 2;
+  else if (CS_UTF8_3C(c))
+    return 3;
+  else if (CS_UTF8_4C(c))
+    return 4;
+  return 1;
+}
+
 char *cs_term_form_input(const char *msg) {
   cs_term_enable_raw_mode();
 
@@ -170,8 +187,26 @@ char *cs_term_form_input(const char *msg) {
     case ARROW_UP:
       break;
     default: {
-      cs_str_insert_char(str, cur - 1, key);
-      // print_input(str, row, cur);
+
+      if (CS_UTF(key)) {
+        int ul = utf_width(key);
+        char buf[ul + 1];
+        buf[0] = key;
+        read_n(buf + 1, ul - 1);
+        buf[ul] = '\0';
+        // write(STDOUT_FILENO, buf, ul);
+        // break;
+        if (cur == idx) {
+          cs_str_append(str, buf);
+        } else {
+          cs_str_insert(str, cur - 1, buf);
+        }
+
+      } else {
+        cs_str_insert_char(str, cur - 1, key);
+      }
+
+      print_input(str, row, cur);
       cur++;
     }
     }

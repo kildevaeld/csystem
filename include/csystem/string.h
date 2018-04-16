@@ -20,7 +20,8 @@ void cs_str_appendf(cs_string_t *, const char *fmt, ...);
 void cs_str_append_char(cs_string_t *, char);
 void cs_str_insert(cs_string_t *, size_t idx, const char *);
 void cs_str_insert_char(cs_string_t *, size_t idx, char);
-
+void cs_str_index_set(cs_string_t *str, size_t idx, char c);
+char cs_str_index_get(cs_string_t *str, size_t idx);
 void cs_str_remove(cs_string_t *, size_t idx, size_t len);
 void cs_str_clear(cs_string_t *);
 void cs_str_compact(cs_string_t *);

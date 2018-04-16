@@ -33,24 +33,9 @@ int main() {
     printf("picked %s\n", list[c]);
   }*/
 
-  /*char *out = cs_term_form_input("test mig:");
+  char *out = cs_term_form_input("test mig:");
   printf("OUT %s\n", out);
-  free(out);*/
-
-  cs_term_enable_raw_mode();
-  while (1) {
-    int c = cs_term_read_key();
-    switch (c) {
-    case CS_CTRL_KEY('c'):
-      return 0;
-    }
-    
-    if (CS_UTF8_2C(c)) {
-      write(STDOUT_FILENO, "utf\n", 4);
-    }
-    
-  }
-
+  free(out);
 
   return 0;
 }

@@ -235,8 +235,13 @@ void cs_str_appendf(cs_string_t *str, const char *fmt, ...) {
 }
 
 void cs_str_insert(cs_string_t *str, size_t idx, const char *s) {
-  if (idx >= str->len)
+  if (idx > str->len) {
     return;
+  }
+  if (idx == str->len) {
+    cs_str_append(str, s);
+    return;
+  }
 
   int len = strlen(s);
   int nlen = str->len + len;
@@ -273,6 +278,18 @@ void cs_str_insert_char(cs_string_t *str, size_t idx, char c) {
     memcpy(str->data + idx + 1, tmp, l);
     str->len = nlen;
   }
+}
+
+char cs_str_index_get(cs_string_t *str, size_t idx) {
+  if (idx >= str->len)
+    return -1;
+  return str->data[idx];
+}
+
+void cs_str_index_set(cs_string_t *str, size_t idx, char c) {
+  if (idx >= str->len)
+    return;
+  str->data[idx] = c;
 }
 
 void cs_str_remove(cs_string_t *str, size_t idx, size_t len) {

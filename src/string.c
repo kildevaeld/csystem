@@ -1,3 +1,4 @@
+#include "utf8.h"
 #include <csystem/string.h>
 #include <math.h>
 #include <stdarg.h>
@@ -327,4 +328,106 @@ char *cs_str_string(cs_string_t *str) {
   cs_str_copy(str, out);
   out[str->len] = '\0';
   return out;
+}
+
+static int utf_width(char c) {
+  if (CS_IS_UTF8_2C(c))
+    return 2;
+  else if (CS_IS_UTF8_3C(c))
+    return 3;
+  else if (CS_IS_UTF8_4C(c))
+    return 4;
+  return 1;
+}
+
+static size_t nearest_index(cs_string_t *str, size_t idx) {
+  int i = idx;
+  if (CS_IS_UTF(str->data[idx])) {
+    i = idx;
+  } else if (CS_IS_UTF(str->data[idx - 1])) {
+    i = idx - 1;
+  } else if (CS_IS_UTF(str->data[idx - 2]) &&
+             !CS_IS_UTF8_2C(str->data[idx - 2])) {
+    i = idx - 2;
+  } else if (CS_IS_UTF(str->data[idx - 3]) &&
+             (!CS_IS_UTF8_2C(str->data[idx - 2]))) {
+    i = idx - 3;
+  }
+  return i;
+}
+
+void cs_str_utf8_append(cs_string_t *str, const char *buf) {}
+void cs_str_utf8_appendf(cs_string_t *str, const char *fmt, ...) {}
+
+int cs_str_utf8_insert(cs_string_t *str, size_t idx, const char *buf) {
+  if (utf8valid(buf)) {
+    return 0;
+  }
+
+  size_t u8len = utf8len(buf);
+
+  if (idx > str->len) {
+    return 0;
+  } else if (idx == str->len) {
+    cs_str_append(str, buf);
+    return u8len;
+  } else if (idx == 0) {
+    cs_str_insert(str, 0, buf);
+    return u8len;
+  }
+
+  size_t i = nearest_index(str, idx);
+  cs_str_insert(str, i, buf);
+
+  return u8len;
+}
+
+int cs_str_utf8_insert_char(cs_string_t *str, size_t idx, char c) {
+
+  if (idx > str->len) {
+    return 0;
+  } else if (idx == str->len) {
+    cs_str_append_char(str, c);
+    return 1;
+  } else if (idx == 0) {
+    cs_str_insert_char(str, 0, c);
+    return 1;
+  }
+
+  size_t i = nearest_index(str, idx);
+  cs_str_insert_char(str, i, c);
+
+  return 1;
+}
+
+int cs_str_utf8_remove(cs_string_t *str, size_t idx, size_t len) {}
+
+size_t cs_str_utf8_len(cs_string_t *str) {
+  const unsigned char *s = str->data;
+  size_t length = 0;
+
+  while ('\0' != *s) {
+    /*if (0xf0 == (0xf8 & *s)) {
+      // 4-byte utf8 code point (began with 0b11110xxx)
+      s += 4;
+    } else if (0xe0 == (0xf0 & *s)) {
+      // 3-byte utf8 code point (began with 0b1110xxxx)
+      s += 3;
+    } else if (0xc0 == (0xe0 & *s)) {
+      // 2-byte utf8 code point (began with 0b110xxxxx)
+      s += 2;
+    } else { // if (0x00 == (0x80 & *s)) {
+      // 1-byte ascii (began with 0b0xxxxxxx)
+      s += 1;
+    }*/
+    if (CS_IS_UTF(*s)) {
+      s += utf_width(*s);
+    }
+
+    // no matter the bytes we marched s forward by, it was
+    // only 1 utf8 codepoint
+    length++;
+  }
+
+  return length;
 }

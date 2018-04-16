@@ -176,9 +176,21 @@ char *cs_term_form_input(const char *msg) {
       if (cur <= idx)
         break;
       cur--;
-      cs_term_cursor_backward(1);
-      cs_str_remove(str, cur - 1, 1);
+      int idx = cur - 1;
+      int count = 1;
+      if (CS_UTF(cs_str_index_get(str, idx))) {
+        count = utf_width(cs_str_index_get(str, idx));
+      } else if (CS_UTF(cs_str_index_get(str, idx - 1))) {
+        count = utf_width(cs_str_index_get(str, idx - 1));
+        idx--;
+      } else if (CS_UTF(cs_str_index_get(str, idx - 2))) {
+        count = utf_width(cs_str_index_get(str, idx - 2));
+        idx -= 2;
+      } /*else {
+      }*/
+      cs_str_remove(str, idx, count);
       print_input(str, row, cur - 1);
+
       break;
     case ENTER_KEY:
       write(STDOUT_FILENO, "\n\r", 2);
@@ -194,8 +206,6 @@ char *cs_term_form_input(const char *msg) {
         buf[0] = key;
         read_n(buf + 1, ul - 1);
         buf[ul] = '\0';
-        // write(STDOUT_FILENO, buf, ul);
-        // break;
         if (cur == idx) {
           cs_str_append(str, buf);
         } else {
@@ -203,7 +213,17 @@ char *cs_term_form_input(const char *msg) {
         }
 
       } else {
-        cs_str_insert_char(str, cur - 1, key);
+        int i = cur - 1;
+        if (CS_UTF(cs_str_index_get(str, i))) {
+          // i--; // count = utf_width(cs_str_index_get(str, idx));
+        } else if (CS_UTF(cs_str_index_get(str, i - 1))) {
+          // count = utf_width(cs_str_index_get(str, idx - 1));
+          i -= 1;
+        } else if (CS_UTF(cs_str_index_get(str, i - 2))) {
+          count = utf_width(cs_str_index_get(str, i - 2));
+          i -= 2;
+        }
+        cs_str_insert_char(str, i, key);
       }
 
       print_input(str, row, cur);

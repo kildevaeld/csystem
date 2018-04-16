@@ -231,7 +231,7 @@ void cs_str_appendf(cs_string_t *str, const char *fmt, ...) {
   }
   va_end(args);
   cs_str_append(str, out);
-  free(args);
+  free(out);
 }
 
 void cs_str_insert(cs_string_t *str, size_t idx, const char *s) {
@@ -253,6 +253,26 @@ void cs_str_insert(cs_string_t *str, size_t idx, const char *s) {
   memcpy(str->data + idx, s, len);
   memcpy(str->data + idx + len, tmp, l);
   str->len = nlen;
+}
+
+void cs_str_insert_char(cs_string_t *str, size_t idx, char c) {
+  int nlen = str->len + 1;
+  if (nlen >= str->alloc) {
+    if (!alloc_atleast(str, nlen)) {
+      return;
+    }
+  }
+
+  if (idx >= str->len) {
+    cs_str_append_char(str, c);
+  } else {
+    int l = str->len - idx;
+    char tmp[l];
+    memcpy(tmp, str->data + idx, l);
+    str->data[idx] = c;
+    memcpy(str->data + idx + 1, tmp, l);
+    str->len = nlen;
+  }
 }
 
 void cs_str_remove(cs_string_t *str, size_t idx, size_t len) {

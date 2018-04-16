@@ -112,29 +112,34 @@ end:
   return ret;
 }
 
-void print_input(const char *msg, cs_string_t *str) {
-  int len = strlen(msg) + 3 + cs_str_len(str);
+void print_input(cs_string_t *str) {
+  /*int len = strlen(msg) + 3 + cs_str_len(str);
   char buf[len + 1];
-  int x, y;
-  // cs_term_cursor_pos_get(&y, &x);
-  // cs_term_erase_current_line();
+
   snprintf(buf, strlen(msg) + 3, "\r%s ", msg);
-  // write(STDOUT_FILENO, buf, strlen(buf));
   cs_str_copy(str, buf + strlen(msg) + 3);
   buf[len] = '\0';
   write(STDOUT_FILENO, buf, len);
+  // cs_term_cursor_pos_set(y, x);*/
+  cs_term_erase_current_line();
+  char buf[cs_str_len(str) + 1];
+  buf[0] = '\r';
+  cs_str_copy(str, buf + 1);
+  write(STDOUT_FILENO, buf, cs_str_len(str) + 1);
   // cs_term_cursor_pos_set(y, x);
 }
 
 char *cs_term_form_input(const char *msg) {
   cs_term_enable_raw_mode();
 
-  char buf[strlen(msg) + 3];
-  snprintf(buf, strlen(msg) + 3, "%s ", msg);
-  write(STDOUT_FILENO, buf, strlen(buf));
+  size_t msg_l = strlen(msg) + 2;
 
   cs_string_t *str = cs_str_alloc();
-  int idx = strlen(str) + 3;
+  cs_str_appendf(str, "%s ", msg);
+
+  print_input(str);
+
+  int idx = msg_l;
   int cur = idx;
   while (1) {
     int key = cs_term_read_key();
@@ -149,24 +154,22 @@ char *cs_term_form_input(const char *msg) {
       cs_term_cursor_backward(1);
       break;
     case ARROW_RIGHT:
-      if (cur >= cs_str_len(str))
+      if (cur >= cs_str_len(str) + idx)
         break;
       cur++;
       cs_term_cursor_forward(1);
       break;
     case BACKSPACE:
-      if (cur == idx)
+      if (cur <= idx)
         break;
-      cs_str_remove(str, cur--, 1);
-      print_input(msg, str);
+      cur--;
       cs_term_cursor_backward(1);
+      cs_str_remove(str, cur - 1, 1);
+      print_input(str);
       break;
     default: {
-      // char buf[1];
-      // buf[0] = key;
-      // write(STDOUT_FILENO, buf, 1);
-      cs_str_append_char(str, key);
-      print_input(msg, str);
+      // cs_str_append_char(str, key);
+      print_input(str);
       cur++;
     }
     }

@@ -112,21 +112,13 @@ end:
   return ret;
 }
 
-void print_input(cs_string_t *str) {
-  /*int len = strlen(msg) + 3 + cs_str_len(str);
-  char buf[len + 1];
-
-  snprintf(buf, strlen(msg) + 3, "\r%s ", msg);
-  cs_str_copy(str, buf + strlen(msg) + 3);
-  buf[len] = '\0';
-  write(STDOUT_FILENO, buf, len);
-  // cs_term_cursor_pos_set(y, x);*/
+void print_input(cs_string_t *str, int row, int col) {
   cs_term_erase_current_line();
   char buf[cs_str_len(str) + 1];
   buf[0] = '\r';
   cs_str_copy(str, buf + 1);
   write(STDOUT_FILENO, buf, cs_str_len(str) + 1);
-  // cs_term_cursor_pos_set(y, x);
+  cs_term_cursor_pos_set(row, col);
 }
 
 char *cs_term_form_input(const char *msg) {
@@ -137,7 +129,10 @@ char *cs_term_form_input(const char *msg) {
   cs_string_t *str = cs_str_alloc();
   cs_str_appendf(str, "%s ", msg);
 
-  print_input(str);
+  int row, col;
+  cs_term_cursor_pos_get(&row, &col);
+
+  print_input(str, row, msg_l - 1);
 
   int idx = msg_l;
   int cur = idx;
@@ -165,11 +160,17 @@ char *cs_term_form_input(const char *msg) {
       cur--;
       cs_term_cursor_backward(1);
       cs_str_remove(str, cur - 1, 1);
-      print_input(str);
+      print_input(str, row, cur - 1);
+      break;
+    case ENTER_KEY:
+      write(STDOUT_FILENO, "\n\r", 2);
+      goto end;
+    case ARROW_DOWN:
+    case ARROW_UP:
       break;
     default: {
-      // cs_str_append_char(str, key);
-      print_input(str);
+      cs_str_insert_char(str, cur - 1, key);
+      print_input(str, row, cur);
       cur++;
     }
     }
@@ -177,5 +178,8 @@ char *cs_term_form_input(const char *msg) {
 
 end:
   cs_term_disable_raw_mode();
-  return NULL;
+  cs_str_remove(str, 0, msg_l - 1);
+  char *out = cs_str_string(str);
+  cs_str_free(str);
+  return out;
 }

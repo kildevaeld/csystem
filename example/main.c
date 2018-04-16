@@ -33,7 +33,8 @@ int main() {
     printf("picked %s\n", list[c]);
   }*/
 
-  cs_term_form_input("test mig:");
-
+  char *out = cs_term_form_input("test mig:");
+  printf("OUT %s\n", out);
+  free(out);
   return 0;
 }

@@ -45,5 +45,8 @@ void test_string() {
   TEST_ASSERT_EQUAL(5, cs_str_len(str));
 
   cs_str_remove(str, 4, 2);
+  TEST_ASSERT_EQUAL_STRING("Hell", cs_str_string(str));
+
+  cs_str_insert_char(str, 2, 'o');
   printf("%s\n", cs_str_string(str));
 }

@@ -340,22 +340,6 @@ static int utf_width(char c) {
   return 1;
 }
 
-static size_t nearest_index(cs_string_t *str, size_t idx) {
-  int i = idx;
-  if (CS_IS_UTF(str->data[idx])) {
-    i = idx;
-  } else if (CS_IS_UTF(str->data[idx - 1])) {
-    i = idx - 1;
-  } else if (CS_IS_UTF(str->data[idx - 2]) &&
-             !CS_IS_UTF8_2C(str->data[idx - 2])) {
-    i = idx - 2;
-  } else if (CS_IS_UTF(str->data[idx - 3]) &&
-             (!CS_IS_UTF8_2C(str->data[idx - 2]))) {
-    i = idx - 3;
-  }
-  return i;
-}
-
 void cs_str_utf8_append(cs_string_t *str, const char *buf) {
   if (utf8valid(buf)) {
     return;
@@ -442,16 +426,14 @@ int cs_str_utf8_remove(cs_string_t *str, size_t idx, size_t len) {
     idx = find_index(str, idx);
   }
 
-  size_t eidx = find_index(str, idx + len + 1);
+  size_t eidx = find_index(str, idx + len);
   size_t nlen = eidx - idx;
-  printf("%i %i %i\n", idx, eidx, nlen);
   cs_str_remove(str, idx, nlen);
 
   return 1;
 }
 
 size_t cs_str_utf8_len(cs_string_t *str) {
-  const unsigned char *s = str->data;
   size_t length = 0;
   size_t i = 0;
   while (i < str->len) {

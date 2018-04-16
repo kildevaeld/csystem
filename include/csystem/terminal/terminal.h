@@ -11,10 +11,10 @@ extern "C" {
 // 0xc0 == (0xe0 & c)
 
 #define CS_CTRL_KEY(k) ((k)&0x1f)
-#define CS_UTF8_4C(k) (0xf0 == (0xf8 & (k)))
+/*#define CS_UTF8_4C(k) (0xf0 == (0xf8 & (k)))
 #define CS_UTF8_3C(k) (0xe0 == (0xf0 & (k)))
 #define CS_UTF8_2C(k) (0xc0 == (0xe0 & (k)))
-#define CS_UTF(k) (CS_UTF8_4C(k) || CS_UTF8_3C(k) || CS_UTF8_2C(k))
+#define CS_UTF(k) (CS_UTF8_4C(k) || CS_UTF8_3C(k) || CS_UTF8_2C(k))*/
 
 enum cs_term_control_keys_t {
   ENTER_KEY = 13,
@@ -41,6 +41,7 @@ bool cs_term_disable_raw_mode();
 void cs_term_clear_screen();
 
 int cs_term_read_key();
+void cs_term_nread_key(char *buf, int c);
 
 int cs_term_cursor_pos_get(int *row, int *col);
 void cs_term_cursor_pos_set(int row, int col);

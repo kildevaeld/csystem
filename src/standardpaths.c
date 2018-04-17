@@ -12,6 +12,11 @@
 #include <direct.h>
 #endif
 
+#if defined(CS_PLATFORM_DARWIN)
+#include "standardpaths_osx.h"
+#endif
+
+
 #define CS_LINUX_GEN(ENV, DEFAULT)                                             \
   char *config = from_env(ENV, buffer, maxlen);                                \
   if (!config && errno == ERR_NOT_FOUND) {                                     \

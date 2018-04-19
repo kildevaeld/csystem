@@ -24,4 +24,17 @@ char * osx_get_path(char *buffer, size_t len) {
     memcpy(buffer, url_s, slen);
 
     return buffer;
-}   
+}
+
+char *get_path_osx(cs_stdpath_dir dir, cs_stdpath_domain domain) {
+    NSArray<NSURL*> *urls = [
+        [NSFileManager defaultManager] 
+        URLsForDirectory:NSApplicationSupportDirectory 
+        inDomains:NSUserDomainMask
+    ];
+
+    if ([urls count] == 0) return NULL;
+
+    
+
+}

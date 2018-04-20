@@ -12,6 +12,10 @@
 #include <direct.h>
 #endif
 
+#if defined(CS_PLATFORM_DARWIN)
+#include "standardpaths_osx.h"
+#endif
+
 #define CS_LINUX_GEN(ENV, DEFAULT)                                             \
   char *config = from_env(ENV, buffer, maxlen);                                \
   if (!config && errno == ERR_NOT_FOUND) {                                     \
@@ -178,6 +182,14 @@ char *cs_gettmpdir(char *buffer, size_t maxlen) {
 #endif
 
   return NULL;
+}
+
+char *cs_path_for_dir(cs_stdpath_dir dir, cs_stdpath_domain domain) {
+#if defined(CS_PLATFORM_LINUX)
+
+#elif defined(CS_PLATFORM_DARWIN)
+
+#endif
 }
 
 #undef CS_LINUX_GEN

@@ -1,5 +1,6 @@
 #include <Cocoa/Cocoa.h>
 #include <string.h>
+#include <csystem/standardpaths.h>
 
 char * osx_get_path(char *buffer, size_t len) {
     NSArray<NSURL*> *urls = [

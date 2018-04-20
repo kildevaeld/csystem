@@ -58,12 +58,25 @@
 #define CS_PLATFORM_NAME "solaris" // Oracle Solaris, Open Indiana
 #define CS_PLATFORM_SOLARIS
 #else
+//#define CS_PLATFORM_NAME NULL
+#endif
+
+#ifndef CS_PLATFORM_NAME
+#define CS_PLATFORM_UNIX
 #define CS_PLATFORM_NAME NULL
 #endif
 
 #if defined(CS_PLATFORM_LINUX) || defined(CS_PLATFORM_DARWIN) ||               \
     defined(CS_PLATFORM_BSD)
 #define CS_PLATFORM_UNIX
+#endif
+
+#if defined(CS_PLATFORM_DARWIN)
+#define CS_DLL_EXTENSION ".dylib"
+#elif defined(CS_PLATFORM_WINDOWS)
+#define CS_DLL_EXTENSION ".dll"
+#else
+#define CS_DLL_EXTENSION ".so"
 #endif
 
 #ifdef __cplusplus

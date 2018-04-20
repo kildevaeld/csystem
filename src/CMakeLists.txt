@@ -12,6 +12,7 @@ configure_file (
   "${PROJECT_BINARY_DIR}/csystem_config.h"
   )
 
+
 if(CS_BUILD_SHARED)
   add_library(csystem SHARED ${SOURCES})
 else()

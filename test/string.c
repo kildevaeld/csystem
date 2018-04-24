@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <unity.h>
 
+void test_string_utf8_size() {
+
+  cs_string_t *str = cs_str_alloc();
+
+  for (int i = 0; i < 1000; i++) {
+    cs_str_utf8_append(str, "T");
+  }
+  printf("%d\n", cs_str_len(str));
+}
+
 void test_string_utf8() {
   cs_string_t *str = cs_str_alloc();
 

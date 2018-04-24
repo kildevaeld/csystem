@@ -151,7 +151,7 @@ char *cs_str_hex_str(const char *str, char *hex, size_t maxlen) {
   return hex;
 }
 
-#define CS_STR_BLOCK_SIZE 9
+#define CS_STR_BLOCK_SIZE 64
 
 typedef struct cs_string_t {
   char *data;
@@ -183,10 +183,10 @@ void cs_str_free(cs_string_t *str) {
 }
 
 static bool alloc_atleast(cs_string_t *str, size_t len) {
-  int i = ceil(len / CS_STR_BLOCK_SIZE);
+  int i = ceil((double)len / (double)CS_STR_BLOCK_SIZE);
   int nsize = i * CS_STR_BLOCK_SIZE;
+  char *data = realloc(str->data, sizeof(char) * nsize);
 
-  char *data = realloc(str->data, nsize);
   if (!data) {
     return false;
   }

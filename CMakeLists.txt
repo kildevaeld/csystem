@@ -13,7 +13,7 @@ option(CS_BUILD_SHARED "build shared" off)
 option(CS_BUILD_CXX "build cxx version" off)
 option(CS_BUILD_TEST "build tests" off)
 option(CS_BUILD_CRYPTO "build crypto" off)
-option(CS_BUILS_TERMINAL "build term" off)
+option(CS_BUILD_TERMINAL "build term" off)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)

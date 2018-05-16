@@ -214,3 +214,76 @@ end:
   cs_str_free(str);
   return out;
 }
+
+char *cs_term_form_password(const char *msg, const char *sub) {
+  cs_term_enable_raw_mode();
+
+  size_t msg_l = strlen(msg) + 2;
+
+  cs_string_t *str = cs_str_alloc();
+  cs_str_utf8_appendf(str, "%s ", msg);
+
+  int row, col;
+  cs_term_cursor_pos_get(&row, &col);
+
+  print_input(str, row, msg_l - 1);
+
+  int idx = msg_l;
+  int cur = idx;
+  while (1) {
+    int key = cs_term_read_key();
+
+    switch (key) {
+    case CS_CTRL_KEY('c'):
+      goto end;
+    case ARROW_LEFT:
+      if (idx == cur)
+        break;
+      cur--;
+      cs_term_cursor_backward(1);
+      break;
+    case ARROW_RIGHT:
+      if (cur > cs_str_utf8_len(str))
+        break;
+      cur++;
+      cs_term_cursor_forward(1);
+      break;
+    case BACKSPACE:
+      if (cur <= idx)
+        break;
+      cur--;
+      cs_str_utf8_remove(str, cur - 1, 1);
+      break;
+    case ENTER_KEY:
+      write(STDOUT_FILENO, "\n\r", 2);
+      goto end;
+    case ARROW_DOWN:
+    case ARROW_UP:
+      break;
+    default: {
+
+      if (CS_IS_UTF(key)) {
+        int ul = utf_width(key);
+        char buf[ul + 1];
+        buf[0] = key;
+        cs_term_nread_key(buf + 1, ul - 1);
+        buf[ul] = '\0';
+        cs_str_utf8_insert(str, cur - 1, buf);
+
+      } else {
+        cs_str_utf8_insert_char(str, cur - 1, key);
+      }
+
+      // print_input(str, row, cur);
+      cur++;
+    }
+    }
+  }
+
+end:
+  cs_term_disable_raw_mode();
+  cs_str_remove(str, 0, msg_l - 1);
+  char *out = cs_str_string(str);
+  cs_str_free(str);
+  return out;
+}

@@ -33,7 +33,7 @@ int main() {
     printf("picked %s\n", list[c]);
   }*/
 
-  char *out = cs_term_form_input("test mig:");
+  char *out = cs_term_form_password("test mig:", NULL);
   printf("OUT %s\n", out);
   free(out);
 

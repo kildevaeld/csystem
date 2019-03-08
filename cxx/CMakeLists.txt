@@ -1,6 +1,7 @@
 
 set(SOURCES 
-    csystem.cpp
+    path.cpp
+    standardpaths.cpp
 )
 
 if(CS_BUILD_SHARED)
